@@ -72,9 +72,11 @@ produce_multi_topic_test() {
             break
         fi
 
+        my_uuid=$(uuidgen)
+
         # 运行测试并将输出追加到文件
         #$kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v time="$(date +'%Y-%m-%d %H:%M:%S')" '{print "[" time "] [" topic "] " $0}' >>produce_multi_topic_test.log &
-        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v time="$(date +'%Y-%m-%d %H:%M:%S')" '{print time " [" topic "] " $0}' >> produce_multi_topic_test.log &
+        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >> produce_multi_topic_test.log &
 
         index=$((index + 1))
     done
@@ -82,7 +84,7 @@ produce_multi_topic_test() {
     echo "produce_multi_topic_test started..."
 
     # 等待所有测试完成
-    #tail -f produce_multi_topic_test.log
+    tail -f produce_multi_topic_test.log
 }
 
 # 测试消费带宽
@@ -111,6 +113,7 @@ consume_multi_topic_test() {
             continue
         fi
 
+        my_uuid=$(uuidgen)
         # 运行测试并将输出追加到文件
         $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages 122916666 --topic topic_0 --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v time="$(date +'%Y-%m-%d %H:%M:%S')" '{print "[" time "] [" topic "] " $0}' >>consume_multi_topic_test.log &
 
