@@ -108,6 +108,7 @@ consume_multi_topic_test() {
     echo "topic 总量: $topic_total_count"
 
     index=1
+    valid_count=0
     for topic in $topics; do
         echo "[$index/$topic_total_count] 开始处理 $topic"
         if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" || $topic == "topic_0" ]]; then
@@ -116,11 +117,17 @@ consume_multi_topic_test() {
             continue
         fi
 
+        if [[ $valid_count == 10 ]]; then
+            echo "已达到 $valid_count 压测进程"
+            break
+        fi
+
         my_uuid=$(uuidgen)
         # 运行测试并将输出追加到文件
-        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages 122916666 --topic topic_0 --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v time="$(date +'%Y-%m-%d %H:%M:%S')" '{print "[" time "] [" topic "] " $0}' >>consume_multi_topic_test.log &
+        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages 122916666 --topic "$topic" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>consume_multi_topic_test.log &
 
         index=$((index + 1))
+        valid_count=$((valid_count + 1))
     done
 
     echo "consume_multi_topic_test started..."
