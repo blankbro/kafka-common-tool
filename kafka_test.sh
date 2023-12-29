@@ -68,7 +68,7 @@ produce_multi_topic_test() {
             index=$((index + 1))
             continue
         fi
-        if [[ $index == 2 ]]; then
+        if [[ $index == 3 ]]; then
             break
         fi
 
