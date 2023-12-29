@@ -4,6 +4,8 @@ kafka_bootstrap_servers=""
 kafka_bin_dir=""
 operation=""
 command_config=""
+replication_factor=2
+
 while [[ $# -gt 0 ]]; do
     # 将当前处理的命令行参数赋值给变量 key
     key="$1"
@@ -29,6 +31,11 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
+    --replication-factor)
+        replication_factor=$2
+        shift
+        shift
+        ;;
     *)
         shift
         ;;
@@ -39,14 +46,14 @@ create_topics() {
     # 创建一个极大的 topic，测试带宽
     topic_name="topic_0"
     echo "开始创建 $topic_name"
-    $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 100 --replication-factor 2 --bootstrap-server $kafka_bootstrap_servers
+    $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 100 --replication-factor $replication_factor --bootstrap-server $kafka_bootstrap_servers
 
     # 创建一堆topic，用于持续测试
     for ((i = 1; i <= 200; i++)); do
         topic_name="topic_$i"
         # 使用kafka-topics.sh脚本创建Topic
         echo "开始创建 $topic_name"
-        $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 10 --replication-factor 2 --bootstrap-server $kafka_bootstrap_servers $command_config
+        $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 10 --replication-factor $replication_factor --bootstrap-server $kafka_bootstrap_servers $command_config
     done
 }
 
@@ -83,7 +90,6 @@ produce_multi_topic_test() {
         my_uuid=$(uuidgen)
 
         # 运行测试并将输出追加到文件
-        #$kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v time="$(date +'%Y-%m-%d %H:%M:%S')" '{print "[" time "] [" topic "] " $0}' >>produce_multi_topic_test.log &
         $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers $command_config 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
 
         index=$((index + 1))
