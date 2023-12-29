@@ -143,7 +143,7 @@ kill_all() {
     fi
 }
 
-if [[ -z $kafka_bootstrap_servers ]]; then
+if [[ $operation != "kill_all" && -z $kafka_bootstrap_servers ]]; then
     echo "请提供 Kafka 集群信息"
     exit
 fi
