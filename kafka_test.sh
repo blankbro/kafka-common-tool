@@ -46,7 +46,7 @@ create_topics() {
     # 创建一个极大的 topic，测试带宽
     topic_name="topic_0"
     echo "开始创建 $topic_name"
-    $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 100 --replication-factor $replication_factor --bootstrap-server $kafka_bootstrap_servers
+    $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 100 --replication-factor $replication_factor --bootstrap-server $kafka_bootstrap_servers $command_config
 
     # 创建一堆topic，用于持续测试
     for ((i = 1; i <= 200; i++)); do
