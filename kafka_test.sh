@@ -3,6 +3,7 @@
 kafka_bootstrap_servers=""
 kafka_bin_dir=""
 operation=""
+command_config=""
 while [[ $# -gt 0 ]]; do
     # 将当前处理的命令行参数赋值给变量 key
     key="$1"
@@ -23,6 +24,11 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
+    --command-config)
+        command_config="--command-config $2"
+        shift
+        shift
+        ;;
     *)
         shift
         ;;
@@ -40,7 +46,7 @@ create_topics() {
         topic_name="topic_$i"
         # 使用kafka-topics.sh脚本创建Topic
         echo "开始创建 $topic_name"
-        $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 10 --replication-factor 2 --bootstrap-server $kafka_bootstrap_servers
+        $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 10 --replication-factor 2 --bootstrap-server $kafka_bootstrap_servers $command_config
     done
 }
 
@@ -49,7 +55,7 @@ produce_single_topic_test() {
     echo "produce_single_topic_test start..."
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
-    $kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers
+    $kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers $command_config
 }
 
 # 测试生产服务器抗压能力
@@ -78,7 +84,7 @@ produce_multi_topic_test() {
 
         # 运行测试并将输出追加到文件
         #$kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v time="$(date +'%Y-%m-%d %H:%M:%S')" '{print "[" time "] [" topic "] " $0}' >>produce_multi_topic_test.log &
-        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
+        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers $command_config 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
 
         index=$((index + 1))
         valid_count=$((valid_count + 1))
@@ -96,7 +102,7 @@ consume_single_topic_test() {
     my_uuid=$(uuidgen)
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
-    $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group "$my_uuid" --messages 122916666 --topic topic_0 --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers
+    $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group "$my_uuid" --messages 122916666 --topic topic_0 --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config
 }
 
 # 测试消费服务器抗压能力
@@ -124,7 +130,7 @@ consume_multi_topic_test() {
 
         my_uuid=$(uuidgen)
         # 运行测试并将输出追加到文件
-        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages 122916666 --topic "$topic" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>consume_multi_topic_test.log &
+        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages 122916666 --topic "$topic" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config 2>&1 | awk -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>consume_multi_topic_test.log &
 
         index=$((index + 1))
         valid_count=$((valid_count + 1))
