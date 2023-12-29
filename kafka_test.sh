@@ -61,6 +61,7 @@ produce_multi_topic_test() {
     echo "topic 总量: $topic_total_count"
 
     index=1
+    valid_count=0
     for topic in $topics; do
         echo "[$index/$topic_total_count] 开始处理 $topic"
         if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" || $topic == "topic_0" ]]; then
@@ -68,7 +69,8 @@ produce_multi_topic_test() {
             index=$((index + 1))
             continue
         fi
-        if [[ $index == 3 ]]; then
+        if [[ $valid_count == 10 ]]; then
+            echo "已达到 $valid_count 压测进程"
             break
         fi
 
@@ -76,9 +78,10 @@ produce_multi_topic_test() {
 
         # 运行测试并将输出追加到文件
         #$kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v time="$(date +'%Y-%m-%d %H:%M:%S')" '{print "[" time "] [" topic "] " $0}' >>produce_multi_topic_test.log &
-        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >> produce_multi_topic_test.log &
+        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
 
         index=$((index + 1))
+        valid_count=$((valid_count + 1))
     done
 
     echo "produce_multi_topic_test started..."
@@ -126,6 +129,20 @@ consume_multi_topic_test() {
     tail -f consume_multi_topic_test.log
 }
 
+kill_all() {
+    # 获取包含特定"topic"的所有进程的PID
+    pids=$(pgrep -f "topic")
+
+    # 检查是否有匹配的进程
+    if [ -n "$pids" ]; then
+        # 终止匹配到的进程
+        pkill -f "topic"
+        echo "已终止进程: $pids"
+    else
+        echo "未找到匹配的进程"
+    fi
+}
+
 if [[ -z $kafka_bootstrap_servers ]]; then
     echo "请提供 Kafka 集群信息"
     exit
@@ -138,6 +155,8 @@ elif [[ $operation == "produce_single_topic_test" ]]; then
     produce_single_topic_test
 elif [[ $operation == "produce_multi_topic_test" ]]; then
     produce_multi_topic_test
+elif [[ $operation == "kill_all" ]]; then
+    kill_all
 elif [[ $operation == "consume_single_topic_test" ]]; then
     consume_single_topic_test
 elif [[ $operation == "consume_multi_topic_test" ]]; then
