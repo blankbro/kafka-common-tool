@@ -71,7 +71,7 @@ produce_multi_topic_test() {
 
         # 运行测试并将输出追加到文件
         #$kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers 2>&1 | awk -v topic="$topic" -v time="$(date +'%Y-%m-%d %H:%M:%S')" '{print "[" time "] [" topic "] " $0}' >>produce_multi_topic_test.log &
-        echo '$kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers | awk -v topic="$topic" -v time="$(date +\"%Y-%m-%d %H:%M:%S\")" "{print \"[\" time \"] [\" topic \"] \" $0}"'
+        echo "$kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers | awk -v topic='$topic' -v time='$(date +\"%Y-%m-%d %H:%M:%S\")' '{print \"[\" time \"] [\" topic \"] \" $0}'"
 
         index=$((index + 1))
     done
