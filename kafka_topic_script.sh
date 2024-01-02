@@ -15,6 +15,11 @@ while [[ $# -gt 0 ]]; do
   key="$1"
 
   case $key in
+  --kafka-bin-dir)
+    kafka_bin_dir="$2"
+    shift
+    shift
+    ;;
   --bootstrap-server)
     kafka_bootstrap_servers="$2"
     # shift 命令将已处理的参数移除, 第一次移除key, 第二次移除对应的值
