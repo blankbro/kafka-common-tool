@@ -136,6 +136,7 @@ delete_all_topics() {
 
         echo "开始删除 $topic"
         $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
+        index=$((index + 1))
     done
 
     end_time=$(date +%s%3N)
