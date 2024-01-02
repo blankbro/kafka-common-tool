@@ -6,9 +6,11 @@ operation=""
 command_config=""
 replication_factor=2
 producer_config=""
-topic_start=1
-topic_end=200
-
+num_records=123000000
+record_size=586
+single_topic=""
+multi_topic_start=1
+multi_topic_end=200
 
 while [[ $# -gt 0 ]]; do
     # 将当前处理的命令行参数赋值给变量 key
@@ -45,13 +47,28 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
-    --topic-start)
-        topic_start=$2
+    --num-records)
+        num_records=$2
         shift
         shift
         ;;
-    --topic-end)
-        topic_end=$2
+    --record-size)
+        record_size=$2
+        shift
+        shift
+        ;;
+    --single-topic)
+        single_topic=$2
+        shift
+        shift
+        ;;
+    --multi-topic-start)
+        multi_topic_start=$2
+        shift
+        shift
+        ;;
+    --multi-topic-end)
+        multi_topic_end=$2
         shift
         shift
         ;;
@@ -68,7 +85,7 @@ create_topics() {
     $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 100 --replication-factor $replication_factor --bootstrap-server $kafka_bootstrap_servers $command_config
 
     # 创建一堆topic，用于持续测试
-    for ((i = $topic_start; i <= $topic_end; i++)); do
+    for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
         topic_name="topic_$i"
         # 使用kafka-topics.sh脚本创建Topic
         echo "开始创建 $topic_name"
@@ -81,8 +98,14 @@ produce_single_topic_test() {
     echo "produce_single_topic_test start..."
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
-    $kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config
-    echo "$kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config"
+    echo "$kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config"
+    start_time=$(date +%s%3N)
+
+    $kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config
+
+    end_time=$(date +%s%3N)
+    duration=$((end_time - start_time))
+    echo "命令执行时间为：${duration} 毫秒"
 }
 
 # 测试生产服务器抗压能力
@@ -92,6 +115,7 @@ produce_multi_topic_test() {
     topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
     topic_total_count=$(echo $topics | wc -w)
     echo "topic 总量: $topic_total_count"
+    start_time=$(date +%s%3N)
 
     index=1
     valid_count=0
@@ -110,7 +134,7 @@ produce_multi_topic_test() {
         my_uuid=$(uuidgen)
 
         # 运行测试并将输出追加到文件
-        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
+        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
 
         index=$((index + 1))
         valid_count=$((valid_count + 1))
@@ -119,16 +143,25 @@ produce_multi_topic_test() {
     echo "produce_multi_topic_test started..."
 
     # 等待所有测试完成
-    tail -f produce_multi_topic_test.log
+    wait
+
+    end_time=$(date +%s%3N)
+    duration=$((end_time - start_time))
+    echo "命令执行时间为：${duration} 毫秒"
 }
 
 # 测试消费带宽
 consume_single_topic_test() {
     echo "consume_single_topic_test start..."
     my_uuid=$(uuidgen)
+    start_time=$(date +%s%3N)
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
     $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group "$my_uuid" --messages 122916666 --topic topic_0 --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config
+
+    end_time=$(date +%s%3N)
+    duration=$((end_time - start_time))
+    echo "命令执行时间为：${duration} 毫秒"
 }
 
 # 测试消费服务器抗压能力
@@ -138,6 +171,7 @@ consume_multi_topic_test() {
     topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
     topic_total_count=$(echo $topics | wc -w)
     echo "topic 总量: $topic_total_count"
+    start_time=$(date +%s%3N)
 
     index=1
     valid_count=0
@@ -165,7 +199,11 @@ consume_multi_topic_test() {
     echo "consume_multi_topic_test started..."
 
     # 等待所有测试完成
-    tail -f consume_multi_topic_test.log
+    wait
+
+    end_time=$(date +%s%3N)
+    duration=$((end_time - start_time))
+    echo "命令执行时间为：${duration} 毫秒"
 }
 
 kill_all() {
