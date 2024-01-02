@@ -6,6 +6,8 @@ operation=""
 command_config=""
 replication_factor=2
 producer_config=""
+topic_start=1
+topic_end=200
 
 
 while [[ $# -gt 0 ]]; do
@@ -43,6 +45,16 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
+    --topic-start)
+        topic_start=$2
+        shift
+        shift
+        ;;
+    --topic-end)
+        topic_end=$2
+        shift
+        shift
+        ;;
     *)
         shift
         ;;
@@ -56,7 +68,7 @@ create_topics() {
     $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions 100 --replication-factor $replication_factor --bootstrap-server $kafka_bootstrap_servers $command_config
 
     # 创建一堆topic，用于持续测试
-    for ((i = 1; i <= 200; i++)); do
+    for ((i = $topic_start; i <= $topic_end; i++)); do
         topic_name="topic_$i"
         # 使用kafka-topics.sh脚本创建Topic
         echo "开始创建 $topic_name"
