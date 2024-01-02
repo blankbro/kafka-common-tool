@@ -82,6 +82,7 @@ produce_single_topic_test() {
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
     $kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config
+    echo "$kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records 122916666 --record-size 586 --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config"
 }
 
 # 测试生产服务器抗压能力
