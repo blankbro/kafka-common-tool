@@ -121,7 +121,7 @@ delete_topics() {
 delete_all_topics() {
     start_time=$(date +%s%3N)
 
-    topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
+    topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers $command_config --list)
     topic_total_count=$(echo $topics | wc -w)
     echo "topic 总量: $topic_total_count"
 
