@@ -128,7 +128,7 @@ delete_all_topics() {
     index=1
     for topic in $topics; do
         echo "[$index/$topic_total_count] 开始处理 $topic"
-        if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" || $topic == "topic_0" ]]; then
+        if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
             echo "跳过 $topic"
             index=$((index + 1))
             continue
