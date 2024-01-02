@@ -7,7 +7,8 @@ command_config=""
 replication_factor=2
 producer_config=""
 num_records=123000000
-record_size=586
+record_size=600
+messages=$num_records
 single_topic=""
 multi_topic_start=1
 multi_topic_end=200
@@ -72,6 +73,11 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
+    --messages)
+        messages=$2
+        shift
+        shift
+        ;;
     *)
         shift
         ;;
@@ -98,10 +104,10 @@ produce_single_topic_test() {
     echo "produce_single_topic_test start..."
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
-    echo "$kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config"
+    echo "$kafka_bin_dir/kafka-producer-perf-test.sh --topic $single_topic --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config"
     start_time=$(date +%s%3N)
 
-    $kafka_bin_dir/kafka-producer-perf-test.sh --topic topic_0 --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config
+    $kafka_bin_dir/kafka-producer-perf-test.sh --topic $single_topic --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
@@ -157,7 +163,7 @@ consume_single_topic_test() {
     start_time=$(date +%s%3N)
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
-    $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group "$my_uuid" --messages 122916666 --topic topic_0 --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config
+    $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group "$my_uuid" --messages $messages --topic $single_topic --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
@@ -190,7 +196,7 @@ consume_multi_topic_test() {
 
         my_uuid=$(uuidgen)
         # 运行测试并将输出追加到文件
-        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages 122916666 --topic "$topic" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config 2>&1 | awk -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>consume_multi_topic_test.log &
+        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages $messages --topic "$topic" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config 2>&1 | awk -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>consume_multi_topic_test.log &
 
         index=$((index + 1))
         valid_count=$((valid_count + 1))
