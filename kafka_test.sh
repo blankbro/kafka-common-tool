@@ -118,6 +118,31 @@ delete_topics() {
     echo "命令执行时间为：${duration} 毫秒"
 }
 
+delete_all_topics() {
+    start_time=$(date +%s%3N)
+
+    topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
+    topic_total_count=$(echo $topics | wc -w)
+    echo "topic 总量: $topic_total_count"
+
+    index=1
+    for topic in $topics; do
+        echo "[$index/$topic_total_count] 开始处理 $topic"
+        if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" || $topic == "topic_0" ]]; then
+            echo "跳过 $topic"
+            index=$((index + 1))
+            continue
+        fi
+
+        echo "开始删除 $topic"
+        $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
+    done
+
+    end_time=$(date +%s%3N)
+    duration=$((end_time - start_time))
+    echo "命令执行时间为：${duration} 毫秒"
+}
+
 # 测试生产带宽
 produce_single_topic_test() {
     echo "produce_single_topic_test start..."
@@ -255,6 +280,8 @@ if [[ $operation == "create_topics" ]]; then
     create_topics
 elif [[ $operation == "delete_topics" ]]; then
     delete_topics
+elif [[ $operation == "delete_all_topics" ]]; then
+    delete_all_topics
 elif [[ $operation == "produce_single_topic_test" ]]; then
     produce_single_topic_test
 elif [[ $operation == "produce_multi_topic_test" ]]; then
