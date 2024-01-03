@@ -240,7 +240,7 @@ consume_multi_topic_test() {
     echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
 
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration}m's"
+    echo "命令执行时间为: ${duration}ms"
     tail -n 20 $logfile
 }
 
