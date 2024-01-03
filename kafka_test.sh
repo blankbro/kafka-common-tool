@@ -94,7 +94,8 @@ create_topics() {
     start_time=$(date +%s%3N)
 
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
-        topic_name="topic_$i"
+        formatted_number=$(printf "%03d" $i)
+        topic_name="topic_$formatted_number"
         echo "开始创建 $topic_name"
         $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions $partitions --replication-factor $replication_factor --bootstrap-server $kafka_bootstrap_servers $command_config
     done
@@ -108,7 +109,8 @@ delete_topics() {
     start_time=$(date +%s%3N)
 
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
-        topic_name="topic_$i"
+        formatted_number=$(printf "%03d" $i)
+        topic_name="topic_$formatted_number"
         echo "开始删除 $topic_name"
         $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic_name" --bootstrap-server $kafka_bootstrap_servers $command_config
     done
