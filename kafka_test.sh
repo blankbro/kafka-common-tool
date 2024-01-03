@@ -171,14 +171,15 @@ produce_single_topic_test() {
 produce_multi_topic_test() {
     echo "produce_multi_topic_test start..."
 
+    request_uuid=$(uuidgen)
+    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" > produce_multi_topic_test.log
     start_time=$(date +%s%3N)
 
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
         formatted_number=$(printf "%03d" $i)
         topic_name="topic_$formatted_number"
-        my_uuid=$(uuidgen)
         echo "$(date +"%Y-%m-%d %H:%M:%S") 开始生产 $topic_name"
-        $kafka_bin_dir/kafka-producer-perf-test.sh --topic "$topic_name" --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic_name" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
+        $kafka_bin_dir/kafka-producer-perf-test.sh --topic "$topic_name" --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic_name" '{print "[" topic "] " $0}' >>produce_multi_topic_test.log &
     done
 
     echo "produce_multi_topic_test started..."
@@ -188,6 +189,8 @@ produce_multi_topic_test() {
     wait
 
     end_time=$(date +%s%3N)
+    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" > produce_multi_topic_test.log
+
     duration=$((end_time - start_time))
     echo "命令执行时间为: ${duration} 毫秒"
 }
