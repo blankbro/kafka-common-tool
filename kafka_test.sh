@@ -174,14 +174,14 @@ produce_multi_topic_test() {
 
     request_uuid=$(uuidgen)
     echo "" > $logfile
-    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> produce_multi_topic_test.log
+    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
     start_time=$(date +%s%3N)
 
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
         formatted_number=$(printf "%03d" $i)
         topic_name="topic_$formatted_number"
         echo "$(date +"%Y-%m-%d %H:%M:%S") 开始生产 $topic_name"
-        $kafka_bin_dir/kafka-producer-perf-test.sh --topic "$topic_name" --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic_name" '{print "[" topic "] " $0}' >>produce_multi_topic_test.log &
+        $kafka_bin_dir/kafka-producer-perf-test.sh --topic "$topic_name" --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic_name" '{print "[" topic "] " $0}' >> $logfile &
     done
 
     echo "produce_multi_topic_test started..."
@@ -191,7 +191,7 @@ produce_multi_topic_test() {
     wait
 
     end_time=$(date +%s%3N)
-    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> produce_multi_topic_test.log
+    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
 
     duration=$((end_time - start_time))
     echo "命令执行时间为: ${duration} 毫秒"
@@ -215,43 +215,33 @@ consume_single_topic_test() {
 # 测试消费服务器抗压能力
 consume_multi_topic_test() {
     echo "consume_multi_topic_test start..."
+    logfile="consume_multi_topic_test.log"
 
-    topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
-    topic_total_count=$(echo $topics | wc -w)
-    echo "topic 总量: $topic_total_count"
+    request_uuid=$(uuidgen)
+    echo "" > $logfile
+    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
     start_time=$(date +%s%3N)
 
-    index=1
-    valid_count=0
-    for topic in $topics; do
-        echo "[$index/$topic_total_count] 开始处理 $topic"
-        if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" || $topic == "topic_0" ]]; then
-            echo "跳过 $topic"
-            index=$((index + 1))
-            continue
-        fi
-
-        if [[ $valid_count == 10 ]]; then
-            echo "已达到 $valid_count 压测进程"
-            break
-        fi
-
-        my_uuid=$(uuidgen)
-        # 运行测试并将输出追加到文件
-        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages $messages --topic "$topic" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $consumer_config 2>&1 | awk -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>consume_multi_topic_test.log &
-
-        index=$((index + 1))
-        valid_count=$((valid_count + 1))
+    for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
+        formatted_number=$(printf "%03d" $i)
+        topic_name="topic_$formatted_number"
+        echo "$(date +"%Y-%m-%d %H:%M:%S") 开始消费 $topic_name"
+        my_group_id=$(uuidgen)
+        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_group_id --messages $messages --topic "$topic_name" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $consumer_config 2>&1 | awk -v my_group_id="$my_group_id" '{print "" my_group_id " [" topic "] " $0}' >> $logfile &
     done
 
     echo "consume_multi_topic_test started..."
 
     # 等待所有测试完成
+    echo "$(date +"%Y-%m-%d %H:%M:%S") 开始等待所有测试完成"
     wait
 
     end_time=$(date +%s%3N)
+    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
+
     duration=$((end_time - start_time))
     echo "命令执行时间为: ${duration} 毫秒"
+    tail -n 20 $logfile
 }
 
 kill_all() {
