@@ -170,9 +170,11 @@ produce_single_topic_test() {
 # 测试生产服务器抗压能力
 produce_multi_topic_test() {
     echo "produce_multi_topic_test start..."
+    logfile="produce_multi_topic_test.log"
 
     request_uuid=$(uuidgen)
-    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" > produce_multi_topic_test.log
+    echo "" > $logfile
+    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> produce_multi_topic_test.log
     start_time=$(date +%s%3N)
 
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
@@ -189,10 +191,11 @@ produce_multi_topic_test() {
     wait
 
     end_time=$(date +%s%3N)
-    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" > produce_multi_topic_test.log
+    echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> produce_multi_topic_test.log
 
     duration=$((end_time - start_time))
     echo "命令执行时间为: ${duration} 毫秒"
+    tail -n 20 $logfile
 }
 
 # 测试消费带宽
