@@ -227,7 +227,7 @@ consume_multi_topic_test() {
         topic_name="topic_$formatted_number"
         echo "$(date +"%Y-%m-%d %H:%M:%S") 开始消费 $topic_name"
         my_group_id=$(uuidgen)
-        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_group_id --messages $messages --topic "$topic_name" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $consumer_config 2>&1 | awk -v my_group_id="$my_group_id" -v topic="$topic_name" '{print "" my_group_id " [" topic "] " $0}' >> $logfile &
+        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group $my_group_id --messages $messages --topic "$topic_name" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $consumer_config 2>&1 | awk -v topic="$topic_name" '{print "[" topic "] " $0}' >> $logfile &
     done
 
     echo "consume_multi_topic_test started..."
