@@ -108,7 +108,7 @@ create_topics() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration} 毫秒"
+    echo "命令执行时间为: ${duration}ms"
 }
 
 delete_topics() {
@@ -123,7 +123,7 @@ delete_topics() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration} 毫秒"
+    echo "命令执行时间为: ${duration}ms"
 }
 
 delete_all_topics() {
@@ -149,7 +149,7 @@ delete_all_topics() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration} 毫秒"
+    echo "命令执行时间为: ${duration}ms"
 }
 
 # 测试生产带宽
@@ -164,7 +164,7 @@ produce_single_topic_test() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration} 毫秒"
+    echo "命令执行时间为: ${duration}ms"
 }
 
 # 测试生产服务器抗压能力
@@ -194,7 +194,7 @@ produce_multi_topic_test() {
     echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
 
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration} 毫秒"
+    echo "命令执行时间为: ${duration}ms"
     tail -n 20 $logfile
 }
 
@@ -209,7 +209,7 @@ consume_single_topic_test() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration} 毫秒"
+    echo "命令执行时间为: ${duration}ms"
 }
 
 # 测试消费服务器抗压能力
@@ -240,7 +240,7 @@ consume_multi_topic_test() {
     echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
 
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration} 毫秒"
+    echo "命令执行时间为: ${duration}m's"
     tail -n 20 $logfile
 }
 
