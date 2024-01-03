@@ -257,15 +257,16 @@ consume_multi_topic_test() {
 kill_all() {
     # 获取包含特定"topic"的所有进程的PID
     pids=$(ps -ef | grep topic | grep -v grep | awk '{print $2}')
+    pid_count=$(echo $pids | wc -w)
 
     # 检查是否有匹配的进程
     if [ -n "$pids" ]; then
         # 终止匹配到的进程
-        echo "匹配到进程: $pids"
-        pkill -f "topic"
-        echo "已终止进程: $pids"
+        echo "匹配到 $pid_count 个进程"
+        kill $pids
+        echo "已终止"
     else
-        echo "未找到匹配的进程"
+        echo "未匹配的进程"
     fi
 }
 
