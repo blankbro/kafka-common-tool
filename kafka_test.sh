@@ -171,37 +171,20 @@ produce_single_topic_test() {
 produce_multi_topic_test() {
     echo "produce_multi_topic_test start..."
 
-    topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
-    topic_total_count=$(echo $topics | wc -w)
-    echo "topic 总量: $topic_total_count"
     start_time=$(date +%s%3N)
 
-    index=1
-    valid_count=0
-    for topic in $topics; do
-        echo "[$index/$topic_total_count] 开始处理 $topic"
-        if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" || $topic == "topic_0" ]]; then
-            echo "跳过 $topic"
-            index=$((index + 1))
-            continue
-        fi
-        if [[ $valid_count == 10 ]]; then
-            echo "已达到 $valid_count 压测进程"
-            break
-        fi
-
+    for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
+        formatted_number=$(printf "%03d" $i)
+        topic_name="topic_$formatted_number"
         my_uuid=$(uuidgen)
-
-        # 运行测试并将输出追加到文件
-        $kafka_bin_dir/kafka-producer-perf-test.sh --topic $topic --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
-
-        index=$((index + 1))
-        valid_count=$((valid_count + 1))
+        echo "$current_time 开始生产 $topic_name"
+        $kafka_bin_dir/kafka-producer-perf-test.sh --topic "$topic_name" --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic" -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>produce_multi_topic_test.log &
     done
 
     echo "produce_multi_topic_test started..."
 
     # 等待所有测试完成
+    echo "$(date +"%Y-%m-%d %H:%M:%S") 开始等待所有测试完成"
     wait
 
     end_time=$(date +%s%3N)
