@@ -249,43 +249,18 @@ consume_multi_topic_test() {
 }
 
 kill_all() {
+    # 获取包含特定"topic"的所有进程的PID
+    pids=$(ps -ef | grep topic | grep -v grep | awk '{print $2}')
 
-    # 检查 /etc/os-release 文件是否存在
-    if [ ! -f /etc/os-release ]; then
-        echo "Unable to determine the Linux distribution."
-        exit 1
-    fi
-
-    # 读取 /etc/os-release 文件
-    source /etc/os-release
-
-    # 判断发行版
-    if [ "$ID" == "ubuntu" ]; then
-        echo "This is Ubuntu."
-        # 获取包含特定"topic"的所有进程的PID
-        pids=$(pgrep -f "topic")
-
-        # 检查是否有匹配的进程
-        if [ -n "$pids" ]; then
-            # 终止匹配到的进程
-            pkill -f "topic"
-            echo "已终止进程: $pids"
-        else
-            echo "未找到匹配的进程"
-        fi
-    elif [ "$ID" == "centos" ]; then
-        echo "This is CentOS."
-        # ps -ef | grep topic: 显示包含 "topic" 的进程列表。
-        # grep -v grep: 排除包含 "grep topic" 的行，以防止将 grep 进程自身纳入终止列表。
-        # awk '{print $2}': 从结果中提取第二列（PID）。
-        # xargs kill: 将提取的 PID 传递给 kill 命令，用于终止这些进程。
-        ps -ef | grep topic | grep -v grep | awk '{print $2}' | xargs kill
-        echo "所有进程已终止"
+    # 检查是否有匹配的进程
+    if [ -n "$pids" ]; then
+        # 终止匹配到的进程
+        echo "匹配到进程: $pids"
+        pkill -f "topic"
+        echo "已终止进程: $pids"
     else
-        echo "Unsupported Linux distribution: $ID"
-        exit 1
+        echo "未找到匹配的进程"
     fi
-
 }
 
 if [[ $operation != "kill_all" && -z $kafka_bootstrap_servers ]]; then
