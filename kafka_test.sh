@@ -4,9 +4,10 @@ kafka_bootstrap_servers=""
 kafka_bin_dir=""
 operation=""
 command_config=""
+producer_config=""
+consumer_config=""
 partitions=10
 replication_factor=2
-producer_config=""
 num_records=123000000
 record_size=600
 messages=$num_records
@@ -41,6 +42,11 @@ while [[ $# -gt 0 ]]; do
         ;;
     --producer.config)
         producer_config="--producer.config $2"
+        shift
+        shift
+        ;;
+    --consumer.config)
+        consumer_config="--consumer.config $2"
         shift
         shift
         ;;
@@ -102,7 +108,7 @@ create_topics() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为：${duration} 毫秒"
+    echo "命令执行时间为: ${duration} 毫秒"
 }
 
 delete_topics() {
@@ -117,7 +123,7 @@ delete_topics() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为：${duration} 毫秒"
+    echo "命令执行时间为: ${duration} 毫秒"
 }
 
 delete_all_topics() {
@@ -143,7 +149,7 @@ delete_all_topics() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为：${duration} 毫秒"
+    echo "命令执行时间为: ${duration} 毫秒"
 }
 
 # 测试生产带宽
@@ -158,7 +164,7 @@ produce_single_topic_test() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为：${duration} 毫秒"
+    echo "命令执行时间为: ${duration} 毫秒"
 }
 
 # 测试生产服务器抗压能力
@@ -200,7 +206,7 @@ produce_multi_topic_test() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为：${duration} 毫秒"
+    echo "命令执行时间为: ${duration} 毫秒"
 }
 
 # 测试消费带宽
@@ -210,11 +216,11 @@ consume_single_topic_test() {
     start_time=$(date +%s%3N)
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
-    $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group "$my_uuid" --messages $messages --topic $single_topic --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config
+    $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group "$my_uuid" --messages $messages --topic $single_topic --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $consumer_config
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为：${duration} 毫秒"
+    echo "命令执行时间为: ${duration} 毫秒"
 }
 
 # 测试消费服务器抗压能力
@@ -243,7 +249,7 @@ consume_multi_topic_test() {
 
         my_uuid=$(uuidgen)
         # 运行测试并将输出追加到文件
-        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages $messages --topic "$topic" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $command_config 2>&1 | awk -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>consume_multi_topic_test.log &
+        $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format yyyy-MM-dd HH:mm:ss:SSS --group $my_uuid --messages $messages --topic "$topic" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $consumer_config 2>&1 | awk -v my_uuid="$my_uuid" '{print "" my_uuid " [" topic "] " $0}' >>consume_multi_topic_test.log &
 
         index=$((index + 1))
         valid_count=$((valid_count + 1))
@@ -256,7 +262,7 @@ consume_multi_topic_test() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为：${duration} 毫秒"
+    echo "命令执行时间为: ${duration} 毫秒"
 }
 
 kill_all() {
