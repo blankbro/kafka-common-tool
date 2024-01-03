@@ -4,7 +4,7 @@ spring:
   application:
     name: spring-boot-kafka
   profiles:
-    active: gcp
+    active: local
   kafka:
     bootstrap-servers:
     consumer:

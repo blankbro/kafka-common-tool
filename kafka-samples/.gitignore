@@ -6,7 +6,8 @@ target/
 /**/.mvn
 /**/application-sdp.yml
 /**/application-gcp.yml
-/**/logs
+/logs
+/output
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
