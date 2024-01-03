@@ -1,0 +1,44 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: spring-boot-kafka
+  profiles:
+    active: gcp
+  kafka:
+    bootstrap-servers:
+    consumer:
+      group-id: ${spring.application.name}
+      # 第一次部署为了避免大量的历史数据用 latest；后续要改回 earliest，避免因新增 partition 导致数据丢失
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: true
+      heartbeat-interval: 6000
+      max-poll-records: 2000
+      fetch-max-bytes: 1048576
+      session-timeout-ms: 30000
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 3
+      # 有acks个分区副本收到消息，生产者才会认为消息写入是成功的。默认值：1
+      # acks: 0
+      # 内存缓冲区大小，单位byte。默认值：32MB。当前值：256M
+      buffer-memory: 268435456
+      # 压缩类型。默认值：none
+      # compression-type: snappy
+      # 一个批次可以使用的内存大小，按byte计算。默认值：16KB。当前值：512KB
+      batch-size: 524288
+      # 发送批次之前等待更多消息加入批次的时间。默认值：0
+      linger-ms: 100
+      # 收到服务器响应之前可以发送多少个消息。默认值：5
+      # max-in-flight-requests-per-connection: 10
+      # 发送的请求大小。默认值：1M。当前值：5M
+      max-request-size: 5242880
+      # 发送数据包的缓冲区大小。默认值：128KB。当前值：640KB
+      # send-buffer-bytes: 655360
+kafka-consumer:
+  concurrency:
+    topic_test_string: 16
+    topic_test_bytes: 16
