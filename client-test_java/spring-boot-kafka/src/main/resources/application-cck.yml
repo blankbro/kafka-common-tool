@@ -1,0 +1,32 @@
+# Confluent Cloud Kafka
+confluent-cloud-kafka:
+  CLUSTER_API_KEY:
+  CLUSTER_API_SECRET:
+
+spring:
+  kafka:
+    bootstrap-servers:
+    properties:
+      # Required connection configs for Kafka producer, consumer, and admin
+      security:
+        protocol: SASL_SSL
+      sasl:
+        mechanism: PLAIN
+        jaas:
+          config: org.apache.kafka.common.security.plain.PlainLoginModule required username='${confluent-cloud-kafka.CLUSTER_API_KEY}' password='${confluent-cloud-kafka.CLUSTER_API_SECRET}';
+      bootstrap:
+        servers: ${spring.kafka.bootstrap-servers}
+      # Best practice for higher availability in Apache Kafka clients prior to 3.0
+      session:
+        timeout:
+          ms: 45000
+      # Required connection configs for Confluent Cloud Schema Registry
+      basic:
+        auth:
+          credentials:
+            source: USER_INFO
+          user:
+            info: {{ SR_API_KEY }}:{{ SR_API_SECRET }}
+      schema:
+        registry:
+          url: https://{{ SR_ENDPOINT }}

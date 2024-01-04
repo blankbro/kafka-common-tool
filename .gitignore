@@ -4,8 +4,6 @@ target/
 !**/src/test/**/target/
 /client-test_java/.idea
 /**/.mvn
-/**/application-sdp.yml
-/**/application-gcp.yml
 /**/logs
 /**/output
 
