@@ -1,12 +1,18 @@
-# 压测环境准备(Centos)
+# 压测环境准备
 
 1. 安装必要的工具
 
 ```shell
+# Centos
 sudo su -
 yum install git
 yum install java-1.8.0-openjdk-devel
 yum install wget
+
+# Ubuntu
+sudo su -
+apt update
+apt install default-jdk
 ```
 
 2. 下载 kafka 脚本
@@ -23,7 +29,7 @@ tar zxvf kafka_2.13-3.5.1.tgz
 ```shell
 mkdir -p /root/github
 cd /root/github
-git clone https://github.com/blankbro/kafka-shell-tool.git
+git clone https://github.com/blankbro/kafka-test-tool.git
 ```
 
 4. 如果是 confluent cloud, 请编写 cloud.properties
