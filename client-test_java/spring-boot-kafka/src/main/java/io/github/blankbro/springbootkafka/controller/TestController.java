@@ -14,6 +14,18 @@ public class TestController {
     @Autowired
     private CustomKafkaProducer customKafkaProducer;
 
+    /**
+     * 从容器中创建 topic
+     * cd /opt/bitnami/kafka/bin
+     * ./kafka-topics.sh --create --topic topic_test_string --bootstrap-server localhost:9092
+     * ./kafka-topics.sh --create --topic topic_test_bytes --bootstrap-server localhost:9092
+     * 测试该接口
+     * curl http://localhost:8088/send?topic=topic_test_string&data=lalala
+     *
+     * @param topic
+     * @param data
+     * @return
+     */
     @GetMapping("/send")
     public Object send(String topic, String data) {
         customKafkaProducer.send(topic, data);

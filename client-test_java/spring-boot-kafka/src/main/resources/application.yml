@@ -4,11 +4,11 @@ spring:
   application:
     name: spring-boot-kafka
   profiles:
-    active: cck
+    active: local
   kafka:
     bootstrap-servers:
     consumer:
-      group-id: ${spring.application.name}
+      group-id: ${spring.application.name}-${spring.profiles.active}
       # 第一次部署为了避免大量的历史数据用 latest；后续要改回 earliest，避免因新增 partition 导致数据丢失
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
