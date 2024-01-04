@@ -26,7 +26,7 @@ spring:
           credentials:
             source: USER_INFO
           user:
-            info: {{ SR_API_KEY }}:{{ SR_API_SECRET }}
+            info: "{{ SR_API_KEY }}:{{ SR_API_SECRET }}"
       schema:
         registry:
-          url: https://{{ SR_ENDPOINT }}
+          url: "https://{{ SR_ENDPOINT }}"

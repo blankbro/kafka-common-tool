@@ -1,10 +1,10 @@
 server:
-  port: 8080
+  port: 8088
 spring:
   application:
     name: spring-boot-kafka
   profiles:
-    active: local
+    active: cck
   kafka:
     bootstrap-servers:
     consumer:

@@ -6,6 +6,7 @@ target/
 /**/.mvn
 /**/logs
 /**/output
+/**/control-cck.sh
 
 ### IntelliJ IDEA ###
 /**/.idea
