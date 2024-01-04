@@ -5,8 +5,9 @@ deploy_path="/root/github/kafka-test-tool/client-test_java/output"
 filePah="${deploy_path}/${jar_name}"
 envi="local"
 java_opts=""
+application_properties=""
 Start() {
-    java $java_opts -jar ${filePah} -Dfile.encoding=utf-8 --spring.profiles.active=${envi} -Djava.security.egd=file:/dev/./urandom --name=${name} &>/dev/null
+    java $java_opts -jar ${filePah} -Dfile.encoding=utf-8 --spring.profiles.active=${envi} ${application_properties} -Djava.security.egd=file:/dev/./urandom --name=${name} &>/dev/null
 }
 Stop() {
     pid=$(ps -ef | grep -n "java.*--name=${name}" | grep -v grep | grep -v kill | awk '{print $2}')
