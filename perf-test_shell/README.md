@@ -85,13 +85,13 @@ cd /root/github/kafka-test-tool/perf-test_shell
 5. 压测多个 topic 生产消息
 
 ```shell
-./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --command-config /root/github/kafka-test-tool/cloud.properties --operation produce_multi_topic_test --multi-topic-start 1 --multi-topic-end 100 --num-records 1000
+./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --producer.config /root/github/kafka-test-tool/cloud.properties --operation produce_multi_topic_test --multi-topic-start 1 --multi-topic-end 100 --num-records 1000
 ```
 
 6. 压测多个 topic 消费消息
 
 ```shell
-./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --command-config /root/github/kafka-test-tool/cloud.properties --operation consume_multi_topic_test --multi-topic-start 1 --multi-topic-end 100 --messages 100
+./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --consumer.config /root/github/kafka-test-tool/cloud.properties --operation consume_multi_topic_test --multi-topic-start 1 --multi-topic-end 100 --messages 100
 ```
 
 7. 终止所有压测进程
