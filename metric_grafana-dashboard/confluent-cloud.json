@@ -81,7 +81,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "grafana"
       },
       "gridPos": {
         "h": 1,
@@ -95,7 +95,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "grafana"
           },
           "refId": "A"
         }
@@ -1169,7 +1169,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "grafana"
       },
       "gridPos": {
         "h": 1,
@@ -1183,7 +1183,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "grafana"
           },
           "refId": "A"
         }
@@ -1923,7 +1923,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "grafana"
       },
       "gridPos": {
         "h": 1,
@@ -1937,7 +1937,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "grafana"
           },
           "refId": "A"
         }
@@ -2393,7 +2393,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "grafana"
       },
       "gridPos": {
         "h": 1,
@@ -2407,7 +2407,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "grafana"
           },
           "refId": "A"
         }
@@ -2554,7 +2554,7 @@
       "collapsed": false,
       "datasource": {
         "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
+        "uid": "grafana"
       },
       "gridPos": {
         "h": 1,
@@ -2568,7 +2568,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "grafana"
           },
           "refId": "A"
         }
@@ -2796,6 +2796,6 @@
   "timezone": "",
   "title": "Confluent Cloud",
   "uid": "fhX5408Zk",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }
