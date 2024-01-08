@@ -157,6 +157,9 @@ produce_single_topic_test() {
     echo "produce_single_topic_test start..."
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
+    # --throughput -1  吞吐量上限 -1：无上限
+    # --num-records 122916666 测试 10 分钟，约 1 亿条消息，177 亿 / 24 / 60 * 10
+    # --record-size 586 每条消息 586B，计算方法：14.19MB(Bytes in /sec) ÷ 25374.72(Messages in /sec)
     echo "$kafka_bin_dir/kafka-producer-perf-test.sh --topic $single_topic --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config"
     start_time=$(date +%s%3N)
 
