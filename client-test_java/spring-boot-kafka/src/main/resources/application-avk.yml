@@ -1,0 +1,27 @@
+aiven-kafka:
+  sasl_username: TODO
+  sasl_password: TODO
+# Aiven Kafka
+spring:
+  kafka:
+    bootstrap-servers: TODO
+    properties:
+      bootstrap:
+        servers: ${spring.kafka.bootstrap-servers}
+      security:
+        protocol: SASL_SSL
+      sasl:
+        mechanism: SCRAM-SHA-256
+        jaas:
+          config: org.apache.kafka.common.security.scram.ScramLoginModule required username='${aiven-kafka.sasl_username}' password='${aiven-kafka.sasl_password}';
+      ssl:
+        endpoint:
+          identification:
+            algorithm: ""
+        truststore:
+          type: jks
+          location: "TODO client.truststore.jks"
+          password: "TODO TRUSTSTORE_PASSWORD"
+      session:
+        timeout:
+          ms: 45000

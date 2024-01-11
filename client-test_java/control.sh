@@ -1,29 +1,71 @@
 #!/bin/bash
-name="spring-boot-kafka"
-jar_name="spring-boot-kafka.jar"
-deploy_path="/root/github/kafka-test-tool/client-test_java/output"
-filePah="${deploy_path}/${jar_name}"
-envi="local"
-java_opts=""
-application_properties=""
+jar_full_path=""
+jar_name=""
+jvm_opts=""
+app_prop=""
+operation=""
+
+while [[ $# -gt 0 ]]; do
+    # 将当前处理的命令行参数赋值给变量 key
+    key="$1"
+
+    case $key in
+    --jar-full-path)
+        jar_full_path=$2
+        jar_name=$(basename "$jar_full_path")
+        shift
+        shift
+        ;;
+    --jvm_opts)
+        jvm_opts=$2
+        shift
+        shift
+        ;;
+    --app_prop)
+        app_prop=$2
+        shift
+        shift
+        ;;
+    --operation)
+        operation=$2
+        shift
+        shift
+        ;;
+    *)
+        shift
+        ;;
+    esac
+done
+
+if [[ -z $operation ]]; then
+    echo "请提供 --operation {start|stop|restart}"
+    exit 1
+fi
+
+if [[ -z $jar_full_path ]]; then
+    echo "请提供 --jar-full-path {your jar full path}"
+    exit 1
+fi
+
 Start() {
-    java $java_opts -jar ${filePah} -Dfile.encoding=utf-8 --spring.profiles.active=${envi} ${application_properties} -Djava.security.egd=file:/dev/./urandom --name=${name} &>/dev/null
+    java $jvm_opts -jar ${jar_full_path} -Dfile.encoding=utf-8 ${app_prop} -Djava.security.egd=file:/dev/./urandom --name=${jar_name} &>/dev/null
 }
+
 Stop() {
-    pid=$(ps -ef | grep -n "java.*--name=${name}" | grep -v grep | grep -v kill | awk '{print $2}')
+    pid=$(ps -ef | grep -n "java.*--name=${jar_name}" | grep -v grep | grep -v kill | awk '{print $2}')
     if [ ${pid} ]; then
-        kill ${tpid}
+        kill ${pid}
         for ((i = 0; i < 10; ++i)); do
             sleep 1
-            pid=$(ps -ef | grep -n "java.*--name=${name}" | grep -v grep | grep -v kill | awk '{print $2}')
-            if [ ${tpid} ]; then
+            pid=$(ps -ef | grep -n "java.*--name=${jar_name}" | grep -v grep | grep -v kill | awk '{print $2}')
+            if [ ${pid} ]; then
                 echo -e ".\c"
             else
                 echo 'Stop Success!'
                 break
             fi
         done
-        pid=$(ps -ef | grep -n "java.*--name=${name}" | grep -v grep | grep -v kill | awk '{print $2}')
+        pid=$(ps -ef | grep -n "java.*--name=${jar_name}" | grep -v grep | grep -v kill | awk '{print $2}')
         if [ ${pid} ]; then
             echo 'Kill Process!'
             kill -9 ${pid}
@@ -33,7 +75,8 @@ Stop() {
     fi
 
 }
-case $1 in
+
+case $operation in
 "start")
     Start
     ;;

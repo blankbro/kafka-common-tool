@@ -1,4 +1,4 @@
-# 压测环境准备（Ubuntu）
+## 压测环境准备（Ubuntu）
 ```shell
 # 安装必要的工具
 apt install default-jdk
@@ -8,7 +8,7 @@ apt install maven
 mvn -version
 ```
 
-# 压测环境准备（Centos）
+## 压测环境准备（Centos）
 1. 安装必要的工具
 
 ```shell
@@ -46,4 +46,34 @@ source /etc/profile
 
 # 验证Maven安装
 mvn -version
+```
+
+## spring-boot-kafka 启动步骤
+
+```shell
+# 拉取脚本
+mkdir -p ~/github
+cd ~/github
+git clone https://github.com/blankbro/hbase-test-tool.git
+
+# 获取最新代码
+cd ~/github/hbase-test-tool/client-test_java/
+git pull
+
+# 编译
+./build.sh spring-boot-kafka
+
+# 停止
+./control.sh --jar-full-path ~/github/hbase-test-tool/client-test_java/output/spring-boot-kafka.jar --operation stop
+
+# 启动 
+# application-local.yml
+./control.sh --jar-full-path ~/github/hbase-test-tool/client-test_java/output/spring-boot-kafka.jar --app_prop "--spring.kafka.bootstrap-servers=xxx " --operation start  &
+# application-cck.yml
+./control.sh --jar-full-path ~/github/hbase-test-tool/client-test_java/output/spring-boot-kafka.jar --app_prop "--spring.kafka.bootstrap-servers=xxx --confluent-cloud-kafka.CLUSTER_API_KEY=xxx --confluent-cloud-kafka.CLUSTER_API_SECRET=xxx " --operation start  &
+# application-avk.yml
+./control.sh --jar-full-path ~/github/hbase-test-tool/client-test_java/output/spring-boot-kafka.jar --app_prop "--spring.kafka.bootstrap-servers=xxx --aiven-kafka.sasl_username=xxx --aiven-kafka.sasl_password=xxx --spring.kafka.properties.ssl.truststore.location=xxx --spring.kafka.properties.ssl.truststore.password=xxx " --operation start  &
+
+# 看日志
+tail -f logs/info.log
 ```
