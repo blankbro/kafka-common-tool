@@ -1,3 +1,8 @@
+```shell
+# 获取当前系统类型
+cat /etc/os-release
+```
+
 ## 压测环境准备（Ubuntu）
 ```shell
 # 安装必要的工具
