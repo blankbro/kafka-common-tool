@@ -53,7 +53,7 @@ Start() {
 
 Stop() {
     pid=$(ps -ef | grep -n "java.*--name=${jar_name}" | grep -v grep | grep -v kill | awk '{print $2}')
-    if [ ${pid} ]; then
+    if [ -n "${pid}" ]; then
         kill ${pid}
         for ((i = 0; i < 10; ++i)); do
             sleep 1
@@ -66,8 +66,8 @@ Stop() {
             fi
         done
         pid=$(ps -ef | grep -n "java.*--name=${jar_name}" | grep -v grep | grep -v kill | awk '{print $2}')
-        if [ ${pid} ]; then
-            echo 'Kill Process!'
+        if [ -n "${pid}" ]; then
+            echo 'Force Kill Process!'
             kill -9 ${pid}
         fi
     else
