@@ -1,4 +1,4 @@
-# 压测环境准备
+## 压测环境准备
 
 1. 安装必要的工具
 
@@ -48,7 +48,7 @@ sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule require
 security.protocol=SASL_SSL
 ```
 
-# 压测命令
+## 压测命令
 
 0. 进入压测脚本目录
 
@@ -104,4 +104,16 @@ cd /root/github/kafka-test-tool/perf-test_shell
 
 ```shell
 ./kafka_test.sh --operation kill_all
+```
+
+## 统计命令
+
+1. 统计 kafka topic 磁盘占用
+
+```shell
+./kafka_topic_script.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.4.1/bin --operation topic_dir_bytes --bootstrap-server <bootstrap-server>
+
+# 如何在excel中将单元格的字节格式化为kb-mb-gb等
+# 参考：https://stackoverflow.com/questions/1533811/how-can-i-format-bytes-a-cell-in-excel-as-kb-mb-gb-etc
+# =IF(A1>POWER(1024,4),TRUNC(A1/POWER(1024,4),2)&" TB", IF(A1>POWER(1024,3),TRUNC(A1/POWER(1024,3),2)&" GB", IF(A1>POWER(1024,2), ROUND(A1/POWER(1024,2),0)&" MB", ROUND(A1/1024,0)&" KB")))
 ```
