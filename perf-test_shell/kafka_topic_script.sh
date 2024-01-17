@@ -185,6 +185,50 @@ create_topics() {
     echo "创建 Kafka topic 数据完成。"
 }
 
+# 统计topic 磁盘占用
+topic_dir_bytes() {
+    echo "topic磁盘占用，开始统计..."
+
+        # 获取 Kafka topic 列表
+        topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
+        topic_total_count=$(echo $topics | wc -w)
+        echo "topic 总量: $topic_total_count"
+
+        # 遍历每个 topic
+        index=1
+        for topic in $topics; do
+            echo "[$index/$topic_total_count] $topic 开始处理"
+            index=$((index + 1))
+            if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
+                echo "跳过无效 Topic: $topic"
+                continue
+            fi
+
+            # 获取当前 topic 的 磁盘占用
+            topic_log_dir=$(./kafka-log-dirs.sh --bootstrap-server $kafka_bootstrap_servers --topic-list $topic --describe)
+
+            # 提取每个 broker
+            brokers=$(echo "$topic_log_dir" | jq -r '.brokers')
+
+            # 遍历每个 broker
+            while IFS= read -r broker; do
+                broker_id=$(echo "$broker" | jq -r '.broker')
+                partitions=$(echo "$broker" | jq -r '.logDirs[0].partitions')
+
+                # 计算每个 broker 的总大小
+                total_size=0
+                while IFS= read -r partition; do
+                    size=$(echo "$partition" | jq -r '.size')
+                    total_size=$((total_size + size))
+                done <<< "$partitions"
+
+                echo "Broker $broker_id 的总磁盘使用量为: $total_size 字节"
+            done <<< "$brokers"
+
+        done
+
+}
+
 if [[ -z $kafka_bootstrap_servers ]]; then
     echo "请提供 Kafka 集群信息"
     exit
@@ -199,6 +243,8 @@ elif [[ $operation == "partition_counts" ]]; then
     partition_counts
 elif [[ $operation == "consumer_counts" ]]; then
     consumer_counts
+elif [[ $operation == "topic_dir_bytes" ]]; then
+    topic_dir_bytes
 else
     echo "请提供正确的参数"
 fi
