@@ -7,6 +7,7 @@ target/
 /**/logs
 /**/output
 /**/control-cck.sh
+/**/*.log
 
 ### IntelliJ IDEA ###
 /**/.idea

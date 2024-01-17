@@ -204,29 +204,17 @@ topic_dir_bytes() {
                 continue
             fi
 
-            # 获取当前 topic 的 磁盘占用
-            topic_log_dir=$(./kafka-log-dirs.sh --bootstrap-server $kafka_bootstrap_servers --topic-list $topic --describe)
+            # 获取当前 topic 的 磁盘占用信息
+            topic_dir_describe=$($kafka_bin_dir/kafka-log-dirs.sh --bootstrap-server $kafka_bootstrap_servers --topic-list $topic --describe | grep -E '^{.*}$')
 
-            # 提取每个 broker
-            brokers=$(echo "$topic_log_dir" | jq -r '.brokers')
+            # 提取 size，并计算总量
+            # jp 官方文档：https://jqlang.github.io/jq/manual/v1.5/#math
+            total_bytes_size=$(echo "$topic_dir_describe" | jq '.brokers[].logDirs[].partitions[].size' | jq -n 'reduce inputs as $i (0; . + $i)')
 
-            # 遍历每个 broker
-            while IFS= read -r broker; do
-                broker_id=$(echo "$broker" | jq -r '.broker')
-                partitions=$(echo "$broker" | jq -r '.logDirs[0].partitions')
-
-                # 计算每个 broker 的总大小
-                total_size=0
-                while IFS= read -r partition; do
-                    size=$(echo "$partition" | jq -r '.size')
-                    total_size=$((total_size + size))
-                done <<< "$partitions"
-
-                echo "Broker $broker_id 的总磁盘使用量为: $total_size 字节"
-            done <<< "$brokers"
-
+            echo "$topic 磁盘总用量为: $total_bytes_size 字节" >> topic_dir_bytes.log
         done
 
+        echo "topic磁盘占用，统计完成..."
 }
 
 if [[ -z $kafka_bootstrap_servers ]]; then
