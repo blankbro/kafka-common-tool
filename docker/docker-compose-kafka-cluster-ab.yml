@@ -18,6 +18,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-a
       KAFKA_BROKER_ID: 1
       ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${HOST_MACHINE_IP}:9092
     depends_on:
       - zookeeper
   kafka-a_2:
@@ -30,6 +32,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-a
       KAFKA_BROKER_ID: 2
       ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${HOST_MACHINE_IP}:9093
     depends_on:
       - zookeeper
   kafka-a_3:
@@ -42,6 +46,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-a
       KAFKA_BROKER_ID: 3
       ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${HOST_MACHINE_IP}:9094
     depends_on:
       - zookeeper
   # kafka cluster b
@@ -55,6 +61,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-b
       KAFKA_BROKER_ID: 1
       ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${HOST_MACHINE_IP}:9192
     depends_on:
       - zookeeper
   kafka-b_2:
@@ -67,6 +75,8 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-b
       KAFKA_BROKER_ID: 2
       ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${HOST_MACHINE_IP}:9193
     depends_on:
       - zookeeper
   kafka-b_3:
@@ -79,14 +89,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-b
       KAFKA_BROKER_ID: 3
       ALLOW_PLAINTEXT_LISTENER: yes
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://${HOST_MACHINE_IP}:9194
     depends_on:
       - zookeeper
-
-# 基于 docker-compose.yml 创建并启动 kafka 集群
-# docker-compose -f docker-compose-kafka-cluster-ab.yml -p kafka-cluster-ab up -d
-# 启动集群
-# docker-compose -f docker-compose-kafka-cluster-ab.yml -p kafka-cluster-ab start
-# 关闭集群
-# docker-compose -f docker-compose-kafka-cluster-ab.yml -p kafka-cluster-ab stop
-# 移除集群
-# docker-compose -f docker-compose-kafka-cluster-ab.yml -p kafka-cluster-ab down
