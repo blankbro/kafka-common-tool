@@ -1,0 +1,92 @@
+# docker compose 语法版本
+version: '3'
+services:
+  # zk
+  zookeeper:
+    image: zookeeper:3.9.1
+    container_name: zk
+    ports:
+      - "2181:2181"
+  # kafka cluster a
+  kafka-a_1:
+    image: bitnami/kafka:2.6.0
+    container_name: kafka-a_node1
+    ports:
+      - "9092:9092"
+    environment:
+      # 要配置一个 kafka 参数，那在 docker-compose.yml 的 environment 中，需要在参数前加上 "KAFKA_" 前缀，并把 kafka 参数转大写，然后将 "." 替换成 "_"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-a
+      KAFKA_BROKER_ID: 1
+      ALLOW_PLAINTEXT_LISTENER: yes
+    depends_on:
+      - zookeeper
+  kafka-a_2:
+    image: bitnami/kafka:2.6.0
+    container_name: kafka-a_node2
+    ports:
+      - "9093:9092"
+    environment:
+      # 要配置一个 kafka 参数，那在 docker-compose.yml 的 environment 中，需要在参数前加上 "KAFKA_" 前缀，并把 kafka 参数转大写，然后将 "." 替换成 "_"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-a
+      KAFKA_BROKER_ID: 2
+      ALLOW_PLAINTEXT_LISTENER: yes
+    depends_on:
+      - zookeeper
+  kafka-a_3:
+    image: bitnami/kafka:2.6.0
+    container_name: kafka-a_node3
+    ports:
+      - "9094:9092"
+    environment:
+      # 要配置一个 kafka 参数，那在 docker-compose.yml 的 environment 中，需要在参数前加上 "KAFKA_" 前缀，并把 kafka 参数转大写，然后将 "." 替换成 "_"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-a
+      KAFKA_BROKER_ID: 3
+      ALLOW_PLAINTEXT_LISTENER: yes
+    depends_on:
+      - zookeeper
+  # kafka cluster b
+  kafka-b_1:
+    image: bitnami/kafka:2.6.0
+    container_name: kafka-b_node1
+    ports:
+      - "9192:9092"
+    environment:
+      # 要配置一个 kafka 参数，那在 docker-compose.yml 的 environment 中，需要在参数前加上 "KAFKA_" 前缀，并把 kafka 参数转大写，然后将 "." 替换成 "_"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-b
+      KAFKA_BROKER_ID: 1
+      ALLOW_PLAINTEXT_LISTENER: yes
+    depends_on:
+      - zookeeper
+  kafka-b_2:
+    image: bitnami/kafka:2.6.0
+    container_name: kafka-b_node2
+    ports:
+      - "9193:9092"
+    environment:
+      # 要配置一个 kafka 参数，那在 docker-compose.yml 的 environment 中，需要在参数前加上 "KAFKA_" 前缀，并把 kafka 参数转大写，然后将 "." 替换成 "_"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-b
+      KAFKA_BROKER_ID: 2
+      ALLOW_PLAINTEXT_LISTENER: yes
+    depends_on:
+      - zookeeper
+  kafka-b_3:
+    image: bitnami/kafka:2.6.0
+    container_name: kafka-b_node3
+    ports:
+      - "9194:9092"
+    environment:
+      # 要配置一个 kafka 参数，那在 docker-compose.yml 的 environment 中，需要在参数前加上 "KAFKA_" 前缀，并把 kafka 参数转大写，然后将 "." 替换成 "_"
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181/kafka-b
+      KAFKA_BROKER_ID: 3
+      ALLOW_PLAINTEXT_LISTENER: yes
+    depends_on:
+      - zookeeper
+
+# 基于 docker-compose.yml 创建并启动 kafka 集群
+# docker-compose -f docker-compose-kafka-cluster-ab.yml -p kafka-cluster-ab up -d
+# 启动集群
+# docker-compose -f docker-compose-kafka-cluster-ab.yml -p kafka-cluster-ab start
+# 关闭集群
+# docker-compose -f docker-compose-kafka-cluster-ab.yml -p kafka-cluster-ab stop
+# 移除集群
+# docker-compose -f docker-compose-kafka-cluster-ab.yml -p kafka-cluster-ab down
