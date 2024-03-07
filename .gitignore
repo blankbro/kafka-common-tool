@@ -45,4 +45,4 @@ build/
 .DS_Store
 
 # docker
-docker/.env
+kafka-docker/.env
