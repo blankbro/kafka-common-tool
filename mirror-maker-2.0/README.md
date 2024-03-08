@@ -6,6 +6,7 @@ kafka_server=127.0.0.1:9092
 kafka_server=127.0.0.1:9192
 topic="testA"
 topic="exclude_testA"
+topic="A.testA"
 ```
 
 **启动MM2**
