@@ -1,4 +1,12 @@
-**设置环境变量**
+**测试环境准备**
+
+```shell
+# kafka 下载
+wget https://archive.apache.org/dist/kafka/3.0.0/kafka_2.13-3.0.0.tgz
+# 解压
+tar zxvf kafka_2.13-3.0.0.tgz
+cd kafka_2.13-3.0.0
+```
 
 ```shell
 export PATH="/Users/lizexin/application/kafka/kafka_2.13-3.0.0/bin:$PATH"
