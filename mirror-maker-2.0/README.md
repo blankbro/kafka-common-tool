@@ -12,6 +12,7 @@ cd kafka_2.13-3.0.0
 export PATH="/Users/lizexin/application/kafka/kafka_2.13-3.0.0/bin:$PATH"
 kafka_server=127.0.0.1:9092
 topic="testA"
+topic="testA_01"
 topic="exclude_testA"
 ```
 
@@ -19,6 +20,7 @@ topic="exclude_testA"
 export PATH="/Users/lizexin/application/kafka/kafka_2.13-3.0.0/bin:$PATH"
 kafka_server=127.0.0.1:9192
 topic="A.testA"
+topic="A.testA_01"
 topic="A.exclude_testA"
 ```
 
