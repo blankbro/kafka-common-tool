@@ -62,42 +62,47 @@ cd /root/github/kafka-test-tool/perf-test_shell
 --multi-topic-end 0 # 用于指定 topic 结束的序列号
 --single-topic # 用于指定固定 topic，压测单个 topic 使用
 --command-config, --producer.config, --consumer.config # 用于指定配置文件 
+
+# 设置环境变量
+kafka_bin_dir=/root/kafka/kafka_2.13-3.5.1/bin
+bootstrap_server="127.1.1.1:9092"
+command_config=/root/github/kafka-test-tool/cloud.properties
 ```
 
 1. 删除 topic
 
 ```shell
-./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --command-config /root/github/kafka-test-tool/cloud.properties --operation delete_all_topics
+./kafka_test.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --command-config $command_config --operation delete_all_topics
 ```
 
 2. 创建 topic
 
 ```shell
-./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --command-config /root/github/kafka-test-tool/cloud.properties --operation create_topics --replication-factor 3 --multi-topic-start 0 --multi-topic-end 0 --partitions 100
+./kafka_test.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --command-config $command_config --operation create_topics --replication-factor 3 --multi-topic-start 0 --multi-topic-end 0 --partitions 100
 ```
 
 3. 压测单个 topic 生产消息
 
 ```shell
-./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --producer.config /root/github/kafka-test-tool/cloud.properties --operation produce_single_topic_test --single-topic topic_000 --num-records 10000000
+./kafka_test.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --producer.config $command_config --operation produce_single_topic_test --single-topic topic_000 --num-records 10000000
 ```
 
 4. 压测单个 topic 消费消息
 
 ```shell
-./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --consumer.config /root/github/kafka-test-tool/cloud.properties --operation consume_single_topic_test --single-topic topic_000 --messages 10000000
+./kafka_test.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --consumer.config $command_config --operation consume_single_topic_test --single-topic topic_000 --messages 10000000
 ```
 
 5. 压测多个 topic 生产消息
 
 ```shell
-./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --producer.config /root/github/kafka-test-tool/cloud.properties --operation produce_multi_topic_test --multi-topic-start 1 --multi-topic-end 100 --num-records 1000
+./kafka_test.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --producer.config $command_config --operation produce_multi_topic_test --multi-topic-start 1 --multi-topic-end 100 --num-records 1000
 ```
 
 6. 压测多个 topic 消费消息
 
 ```shell
-./kafka_test.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.5.1/bin --bootstrap-server <bootstrap-server> --consumer.config /root/github/kafka-test-tool/cloud.properties --operation consume_multi_topic_test --multi-topic-start 1 --multi-topic-end 100 --messages 100
+./kafka_test.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --consumer.config $command_config --operation consume_multi_topic_test --multi-topic-start 1 --multi-topic-end 100 --messages 100
 ```
 
 7. 终止所有压测进程
@@ -111,7 +116,7 @@ cd /root/github/kafka-test-tool/perf-test_shell
 1. 统计 kafka topic 磁盘占用
 
 ```shell
-./kafka_topic_script.sh --kafka-bin-dir /root/kafka/kafka_2.13-3.4.1/bin --operation topic_dir_bytes --bootstrap-server <bootstrap-server>
+./kafka_topic_script.sh --kafka-bin-dir $kafka_bin_dir --operation topic_dir_bytes --bootstrap-server $bootstrap_server
 
 # 如何在excel中将单元格的字节格式化为kb-mb-gb等
 # 参考：https://stackoverflow.com/questions/1533811/how-can-i-format-bytes-a-cell-in-excel-as-kb-mb-gb-etc
