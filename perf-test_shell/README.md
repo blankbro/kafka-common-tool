@@ -20,8 +20,8 @@ apt install default-jdk
 ```shell
 mkdir -p /root/kafka
 cd /root/kafka
-wget https://downloads.apache.org/kafka/3.5.1/kafka_2.13-3.5.1.tgz
-tar zxvf kafka_2.13-3.5.1.tgz
+wget https://archive.apache.org/dist/kafka/3.0.0/kafka_2.13-3.0.0.tgz
+tar zxvf kafka_2.13-3.0.0.tgz
 ```
 
 3. 下载压测脚本
@@ -64,7 +64,7 @@ cd /root/github/kafka-test-tool/perf-test_shell
 --command-config, --producer.config, --consumer.config # 用于指定配置文件 
 
 # 设置环境变量
-kafka_bin_dir=/root/kafka/kafka_2.13-3.5.1/bin
+kafka_bin_dir=/root/kafka/kafka_2.13-3.0.0/bin
 bootstrap_server="127.1.1.1:9092"
 command_config=/root/github/kafka-test-tool/cloud.properties
 ```
