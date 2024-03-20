@@ -4,7 +4,7 @@
 kafka_bootstrap_servers=""
 kafka_bin_dir="."
 operation=""
-topic_grep=""
+topic_blacklist=""
 
 # 解析命令行参数
 # $# 是一个特殊变量，表示命令行参数的数量。-gt 是一个比较运算符，表示大于。
@@ -29,8 +29,8 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
-    --topic_grep)
-        topic_grep="$2"
+    --topic_blacklist)
+        topic_blacklist="$2"
         shift
         shift
         ;;
@@ -48,12 +48,30 @@ topic_count() {
     topic_total_count=$(echo $topics | wc -w)
 
     index=1
-    for topic in $topics; do
-        echo "[$index/$topic_total_count] $topic"
-        index=$((index + 1))
-    done
+        internal_topic_count=0
+        blacklist_topic_count=0
+        valid_topic_count=0
+        partition_total_count=0
+        for topic in $topics; do
+            log_prefix="[$index/$topic_total_count] $topic -"
+            echo "$log_prefix 开始处理"
+            if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
+                echo "$log_prefix kafka internal topic"
+                internal_topic_count=$((internal_topic_count+1))
+            elif [[ $topic_blacklist != "" && $topic != *"$topic_blacklist"* ]]; then
+                echo "$log_prefix in blacklist"
+                blacklist_topic_count=$((blacklist_topic_count+1))
+            else
+                valid_topic_count=$((valid_topic_count + 1))
+            fi
+            index=$((index + 1))
+        done
 
-    echo "topic 总量: $topic_total_count"
+        echo "topic_total_count: $topic_total_count"
+        echo "internal_topic_count: $internal_topic_count"
+        echo "blacklist_topic_count: $blacklist_topic_count"
+        echo "valid_topic_count: $valid_topic_count"
+        echo "partition_total_count: $partition_total_count"
 }
 
 partition_count() {
@@ -66,31 +84,34 @@ partition_count() {
 
     # 遍历每个 topic
     index=1
-    topic_valid_count=0
+    internal_topic_count=0
+    blacklist_topic_count=0
+    valid_topic_count=0
     partition_total_count=0
     for topic in $topics; do
-        echo "[$index/$topic_total_count] $topic 开始处理"
+        log_prefix="[$index/$topic_total_count] $topic -"
+        echo "$log_prefix 开始处理"
         if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
-            echo "跳过无效 Topic: $topic"
-            index=$((index + 1))
-            continue
-        elif [[ $topic_grep != "" && $topic != *"$topic_grep"* ]]; then
-            echo "跳过不匹配的 Topic: $topic"
-            index=$((index + 1))
-            continue
+            echo "$log_prefix kafka internal topic"
+            internal_topic_count=$((internal_topic_count+1))
+        elif [[ $topic_blacklist != "" && $topic != *"$topic_blacklist"* ]]; then
+            echo "$log_prefix in blacklist"
+            blacklist_topic_count=$((blacklist_topic_count+1))
+        else
+            valid_topic_count=$((valid_topic_count + 1))
+            # 获取当前 topic 的 partition 数量
+            partition_count=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $4}')
+            echo "$log_prefix 有 $partition_count 个 partition"
+            partition_total_count=$((partition_total_count + partition_count))
         fi
-
-        topic_valid_count=$((topic_valid_count + 1))
-        # 获取当前 topic 的 partition 数量
-        count=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $4}')
-        echo "[$index/$topic_total_count] $topic 有 $count 个 partition"
-        partition_total_count=$((partition_total_count + count))
         index=$((index + 1))
     done
 
-    echo "topic 总量: $topic_total_count"
-    echo "topic 有效总量: $topic_valid_count"
-    echo "partition 有效总量: $partition_total_count"
+    echo "topic_total_count: $topic_total_count"
+    echo "internal_topic_count: $internal_topic_count"
+    echo "blacklist_topic_count: $blacklist_topic_count"
+    echo "valid_topic_count: $valid_topic_count"
+    echo "partition_total_count: $partition_total_count"
 }
 
 # 统计 consumer 数量
