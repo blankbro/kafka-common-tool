@@ -2,8 +2,6 @@
 
 # 默认值
 kafka_bootstrap_servers=""
-backup_file=""
-create_input_file=""
 kafka_bin_dir="."
 operation=""
 topic_grep=""
@@ -31,16 +29,6 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
-    --backup_file)
-        backup_file="$2"
-        shift
-        shift
-        ;;
-    --create_input_file)
-        create_input_file="$2"
-        shift
-        shift
-        ;;
     --topic_grep)
         topic_grep="$2"
         shift
@@ -52,45 +40,23 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# 备份 Kafka topic 数据函数
-backup_topics() {
-    echo "备份 Kafka topic 数据开始..."
+topic_count() {
+    echo "topic数量，开始统计..."
 
     # 获取 Kafka topic 列表
     topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
     topic_total_count=$(echo $topics | wc -w)
-    echo "topic 总量: $topic_total_count"
 
-    # 清空输出文件
-    echo "" >$backup_file
-
-    # 遍历每个 topic
     index=1
     for topic in $topics; do
-        echo "[$index/$topic_total_count] 开始处理 $topic"
-        if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
-            echo "跳过 $topic"
-            index=$((index + 1))
-            continue
-        elif [[ $topic_grep != "" && $topic != *"$topic_grep"* ]]; then
-            echo "跳过不匹配的 Topic: $topic"
-            index=$((index + 1))
-            continue
-        fi
-
-        # 将数据写入输出文件
-        # echo $kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $1,$2}{print $3,$4} {print $5,$6}'
-        $kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $1,$2}{print $3,$4} {print $5,$6}' >>$backup_file
-
-        # 空行隔开
-        echo "" >>$backup_file
+        echo "[$index/$topic_total_count] $topic"
         index=$((index + 1))
     done
 
-    echo "备份 Kafka topic 数据完成，并已写入文件: $backup_file"
+    echo "topic 总量: $topic_total_count"
 }
 
-partition_counts() {
+partition_count() {
     echo "partition数量，开始统计..."
 
     # 获取 Kafka topic 列表
@@ -128,10 +94,10 @@ partition_counts() {
 }
 
 # 统计 consumer 数量
-consumer_counts() {
+consumer_count() {
     echo "consumer数量，开始统计..."
 
-    # 获取 Kafka topic 列表
+    # 获取 Kafka group 列表
     consumer_groups=$($kafka_bin_dir/kafka-consumer-groups.sh --bootstrap-server $kafka_bootstrap_servers --list)
     group_total_count=$(echo $consumer_groups | wc -w)
     echo "group 总量: $group_total_count"
@@ -144,10 +110,10 @@ consumer_counts() {
     for consumer_group in $consumer_groups; do
         echo "[$index/$group_total_count] $consumer_group 开始处理"
         # 获取当前 consumer_group 的 consumer 数量，写入到临时文件
-        $kafka_bin_dir/kafka-consumer-groups.sh --bootstrap-server $kafka_bootstrap_servers --describe --group $consumer_group >consumer_counts.temp
-        count=$(cat consumer_counts.temp | awk 'NF>1 && !/CONSUMER-ID/{print $7}' | wc -l)
-        active_count=$(cat consumer_counts.temp | awk 'NF>1 && !/CONSUMER-ID/ && $7!="-"{print $7}' | sort | uniq | wc -l)
-        noactive_count=$(cat consumer_counts.temp | awk 'NF>1 && !/CONSUMER-ID/ && $7=="-"{print $7}' | grep -c "-")
+        $kafka_bin_dir/kafka-consumer-groups.sh --bootstrap-server $kafka_bootstrap_servers --describe --group $consumer_group >consumer_count.temp
+        count=$(cat consumer_count.temp | awk 'NF>1 && !/CONSUMER-ID/{print $7}' | wc -l)
+        active_count=$(cat consumer_count.temp | awk 'NF>1 && !/CONSUMER-ID/ && $7!="-"{print $7}' | sort | uniq | wc -l)
+        noactive_count=$(cat consumer_count.temp | awk 'NF>1 && !/CONSUMER-ID/ && $7=="-"{print $7}' | grep -c "-")
         echo "[$index/$group_total_count] $consumer_group 共有 $count 个 consumer，有 active $active_count 个，有 noactive $noactive_count 个"
         consumer_total_count=$((consumer_total_count + count))
         active_consumer_total_count=$((active_consumer_total_count + active_count))
@@ -161,32 +127,8 @@ consumer_counts() {
     echo "noactive consumer 总量: $noactive_consumer_total_count"
 }
 
-# 创建 Kafka topic 数据函数
-create_topics() {
-    echo "创建 Kafka topic 数据开始..."
-
-    # 读取备份文件内容
-    while IFS= read -r line; do
-        # 提取 topic 名称、分区和副本因子
-        if [[ $line == "Topic: "* ]]; then
-            topic=${line#"Topic: "}
-        elif [[ $line == "PartitionCount: "* ]]; then
-            partitions=${line#"PartitionCount: "}
-        elif [[ $line == "ReplicationFactor: "* ]]; then
-            replication_factor=${line#"ReplicationFactor: "}
-
-            # 创建 topic
-            echo "$topic parition:[$partitions], replication_factor:[$replication_factor] 开始创建"
-            # $kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --create --topic $topic --partitions $partitions --replication-factor $replication_factor
-            echo "$topic 完成创建"
-        fi
-    done <$create_input_file
-
-    echo "创建 Kafka topic 数据完成。"
-}
-
 # 统计topic 磁盘占用
-topic_dir_bytes() {
+topic_bytes() {
     echo "topic磁盘占用，开始统计..."
 
         # 获取 Kafka topic 列表
@@ -223,16 +165,14 @@ if [[ -z $kafka_bootstrap_servers ]]; then
 fi
 
 # 根据参数执行对应功能
-if [[ $operation == "backup_topics" ]]; then
-    backup_topics
-elif [[ $operation == "create_topics" ]]; then
-    create_topics
-elif [[ $operation == "partition_counts" ]]; then
-    partition_counts
-elif [[ $operation == "consumer_counts" ]]; then
-    consumer_counts
-elif [[ $operation == "topic_dir_bytes" ]]; then
-    topic_dir_bytes
+if [[ $operation == "topic_count" ]]; then
+    topic_count
+elif [[ $operation == "partition_count" ]]; then
+    partition_count
+elif [[ $operation == "consumer_count" ]]; then
+    consumer_count
+elif [[ $operation == "topic_bytes" ]]; then
+    topic_bytes
 else
     echo "请提供正确的参数"
 fi

@@ -44,5 +44,7 @@ build/
 ### Mac OS ###
 .DS_Store
 
-# docker
+# me
 kafka-docker/.env
+common_shell/.sasl.properties
+common_shell/.env
