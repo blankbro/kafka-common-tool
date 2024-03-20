@@ -22,6 +22,9 @@ mkdir -p /root/kafka
 cd /root/kafka
 wget https://archive.apache.org/dist/kafka/3.0.0/kafka_2.13-3.0.0.tgz
 tar zxvf kafka_2.13-3.0.0.tgz
+
+wget --no-check-certificate https://archive.apache.org/dist/kafka/2.6.2/kafka_2.13-2.6.2.tgz
+tar zxvf kafka_2.13-2.6.2.tgz
 ```
 
 3. 下载压测脚本
