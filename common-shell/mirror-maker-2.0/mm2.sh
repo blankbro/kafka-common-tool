@@ -38,8 +38,8 @@ Start(){
 
     # 不再控制台打印任何日志: &>/dev/null 相当于 >/dev/null 2>&1
     # 后台启动: &
-    echo "sh ${kafka_bin_dir}/connect-mirror-maker.sh connect-mirror-maker.properties &>/dev/null &"
-    sh ${kafka_bin_dir}/connect-mirror-maker.sh connect-mirror-maker.properties &>/dev/null &
+    echo "sh ${kafka_bin_dir}/connect-mirror-maker.sh mm2.properties &>/dev/null &"
+    sh ${kafka_bin_dir}/connect-mirror-maker.sh mm2.properties &>/dev/null &
 
     for ((i=0; i<10; ++i)) do
         sleep 1

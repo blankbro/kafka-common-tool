@@ -46,5 +46,5 @@ build/
 
 # me
 kafka-docker/.env
-common_shell/.sasl.properties
-common_shell/.env
+common-shell/.sasl.properties
+common-shell/.env
