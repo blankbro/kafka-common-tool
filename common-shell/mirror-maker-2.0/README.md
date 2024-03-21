@@ -19,7 +19,15 @@ topic="A.exclude_testA"
 **启动MM2**
 
 ```shell
-connect-mirror-maker.sh mm2.properties
+# 根据模板编辑您自己的 mm2.properties
+cp mm2.properties.template mm2.properties
+vim mm2.properties
+
+# 设置好环境变量
+source .env
+
+# 启动
+mm2.sh start
 ```
 
 **Topic 相关操作**

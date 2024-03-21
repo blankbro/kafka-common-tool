@@ -9,8 +9,8 @@ clusters = A, B
 # connection information for each cluster
 # This is a comma separated host:port pairs for each cluster
 # for e.g. "A_host1:9092, A_host2:9092, A_host3:9092"
-A.bootstrap.servers = 10.10.37.128:9092, 10.10.37.128:9093, 10.10.37.128:9094
-B.bootstrap.servers = 10.10.37.128:9192, 10.10.37.128:9193, 10.10.37.128:9194
+A.bootstrap.servers = 127.0.0.1:9092
+B.bootstrap.servers = 127.0.0.1:9192
 
 # enable and configure individual replication flows
 A->B.enabled = true

@@ -135,10 +135,16 @@ source .env
 # =IF(A1>POWER(1024,4),TRUNC(A1/POWER(1024,4),2)&" TB", IF(A1>POWER(1024,3),TRUNC(A1/POWER(1024,3),2)&" GB", IF(A1>POWER(1024,2), ROUND(A1/POWER(1024,2),0)&" MB", ROUND(A1/1024,0)&" KB")))
 ```
 
-## 备份与恢复
+## 备份与创建
 
-1. 备份
+1. 备份 topic
 
 ```shell
 nohup ./kafka_topic_mirror.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --operation backup_topic > kafka_topic_mirror.log &
+```
+
+2. 创建 topic
+
+```shell
+nohup ./kafka_topic_mirror.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $mirror_bootstrap_server --operation create_topic > kafka_topic_mirror.log &
 ```

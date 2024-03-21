@@ -3,10 +3,9 @@
 # 默认值
 kafka_bootstrap_servers=""
 backup_file="topic_backup.txt"
-create_input_file=""
 kafka_bin_dir="."
 operation=""
-topic_grep=""
+topic_blacklist=""
 
 # 解析命令行参数
 # $# 是一个特殊变量，表示命令行参数的数量。-gt 是一个比较运算符，表示大于。
@@ -36,13 +35,8 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
-    --create_input_file)
-        create_input_file="$2"
-        shift
-        shift
-        ;;
-    --topic_grep)
-        topic_grep="$2"
+    --topic_blacklist)
+        topic_blacklist="$2"
         shift
         shift
         ;;
@@ -74,7 +68,7 @@ backup_topic() {
         if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
             echo "$log_prefix kafka internal topic"
             internal_topic_count=$((internal_topic_count+1))
-        elif [[ $topic_grep != "" && $topic != *"$topic_grep"* ]]; then
+        elif [[ $topic_blacklist != "" && $topic != *"$topic_blacklist"* ]]; then
             echo "$log_prefix in blacklist"
             blacklist_topic_count=$((blacklist_topic_count+1))
         else
@@ -117,7 +111,7 @@ create_topic() {
             echo "$kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --create --topic $topic --partitions $partitions --replication-factor $replication_factor"
             echo "$topic 完成创建"
         fi
-    done <$create_input_file
+    done <$backup_file
 
     echo "所有 Kafka topic 创建完成。"
 }

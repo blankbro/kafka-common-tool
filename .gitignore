@@ -49,3 +49,4 @@ kafka-docker/.env
 common-shell/.sasl.properties
 common-shell/.env
 common-shell/topic_backup.txt
+common-shell/mirror-maker-2.0/mm2.properties
