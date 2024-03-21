@@ -146,5 +146,5 @@ nohup ./kafka_topic_mirror.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server 
 2. 创建 topic
 
 ```shell
-nohup ./kafka_topic_mirror.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $mirror_bootstrap_server --operation create_topic > kafka_topic_mirror.log &
+nohup ./kafka_topic_mirror.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $mirror_bootstrap_server --operation create_topic > kafka_topic_mirror.log 2>&1 &
 ```
