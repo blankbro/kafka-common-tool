@@ -109,7 +109,7 @@ create_topic() {
             replication_factor=${line#"ReplicationFactor: "}
 
             # 创建 topic
-            echo "$topic 开始创建, partition = $partitions, replication_factor = $replication_factor"
+            echo "$(date "+%Y-%m-%d %H:%M:%S") $topic 开始创建, partition = $partitions, replication_factor = $replication_factor"
             echo "$kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --create --topic $topic --partitions $partitions --replication-factor $replication_factor"
             created_topic_count=$((created_topic_count + 1))
             created_partition_count=$((created_partition_count + $partitions))
