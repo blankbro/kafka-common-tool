@@ -102,13 +102,13 @@ create_topics() {
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
         formatted_number=$(printf "%03d" $i)
         topic_name="topic_$formatted_number"
-        echo "开始创建 $topic_name"
+        echo "$(date "+%Y-%m-%d %H:%M:%S") 开始创建 $topic_name"
         $kafka_bin_dir/kafka-topics.sh --create --topic "$topic_name" --partitions $partitions --replication-factor $replication_factor --bootstrap-server $kafka_bootstrap_servers $command_config
     done
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration}ms"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
 
 delete_topics() {
@@ -117,13 +117,13 @@ delete_topics() {
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
         formatted_number=$(printf "%03d" $i)
         topic_name="topic_$formatted_number"
-        echo "开始删除 $topic_name"
+        echo "$(date "+%Y-%m-%d %H:%M:%S") 开始删除 $topic_name"
         $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic_name" --bootstrap-server $kafka_bootstrap_servers $command_config
     done
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration}ms"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
 
 delete_all_topics() {
@@ -131,30 +131,28 @@ delete_all_topics() {
 
     topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers $command_config --list)
     topic_total_count=$(echo $topics | wc -w)
-    echo "topic 总量: $topic_total_count"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") topic 总量: $topic_total_count"
 
     index=1
     for topic in $topics; do
-        echo "[$index/$topic_total_count] 开始处理 $topic"
+        echo "$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] 开始处理 $topic"
         if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
-            echo "跳过 $topic"
-            index=$((index + 1))
-            continue
+            echo "$(date "+%Y-%m-%d %H:%M:%S") 跳过 $topic"
+        else
+            echo "$(date "+%Y-%m-%d %H:%M:%S") 开始删除 $topic"
+            $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
         fi
-
-        echo "开始删除 $topic"
-        $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
         index=$((index + 1))
     done
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration}ms"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
 
 # 测试生产带宽
 produce_single_topic_test() {
-    echo "produce_single_topic_test start..."
+    echo "$(date "+%Y-%m-%d %H:%M:%S") produce_single_topic_test start..."
 
     # 给 topic_0 发 1.22 亿条 586B 的消息
     # --throughput -1  吞吐量上限 -1：无上限
@@ -167,12 +165,12 @@ produce_single_topic_test() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration}ms"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
 
 # 测试生产服务器抗压能力
 produce_multi_topic_test() {
-    echo "produce_multi_topic_test start..."
+    echo "$(date "+%Y-%m-%d %H:%M:%S") produce_multi_topic_test start..."
     logfile="produce_multi_topic_test.log"
 
     request_uuid=$(uuidgen)
@@ -187,7 +185,7 @@ produce_multi_topic_test() {
         $kafka_bin_dir/kafka-producer-perf-test.sh --topic "$topic_name" --throughput -1 --num-records $num_records --record-size $record_size --producer-props bootstrap.servers=$kafka_bootstrap_servers $producer_config 2>&1 | awk -v topic="$topic_name" '{print "[" topic "] " $0}' >> $logfile &
     done
 
-    echo "produce_multi_topic_test started..."
+    echo "$(date "+%Y-%m-%d %H:%M:%S") produce_multi_topic_test started..."
 
     # 等待所有测试完成
     echo "$(date +"%Y-%m-%d %H:%M:%S") 开始等待所有测试完成"
@@ -197,13 +195,13 @@ produce_multi_topic_test() {
     echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
 
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration}ms"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
     tail -n 20 $logfile
 }
 
 # 测试消费带宽
 consume_single_topic_test() {
-    echo "consume_single_topic_test start..."
+    echo "$(date "+%Y-%m-%d %H:%M:%S") consume_single_topic_test start..."
     my_uuid=$(uuidgen)
     start_time=$(date +%s%3N)
 
@@ -212,12 +210,12 @@ consume_single_topic_test() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration}ms"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
 
 # 测试消费服务器抗压能力
 consume_multi_topic_test() {
-    echo "consume_multi_topic_test start..."
+    echo "$(date "+%Y-%m-%d %H:%M:%S") consume_multi_topic_test start..."
     logfile="consume_multi_topic_test.log"
 
     request_uuid=$(uuidgen)
@@ -233,7 +231,7 @@ consume_multi_topic_test() {
         $kafka_bin_dir/kafka-consumer-perf-test.sh --date-format "yyyy-MM-dd HH:mm:ss:SSS" --group $my_group_id --messages $messages --topic "$topic_name" --bootstrap-server bootstrap.servers=$kafka_bootstrap_servers $consumer_config 2>&1 | awk -v topic="$topic_name" '{print "[" topic "] " $0}' >> $logfile &
     done
 
-    echo "consume_multi_topic_test started..."
+    echo "$(date "+%Y-%m-%d %H:%M:%S") consume_multi_topic_test started..."
 
     # 等待所有测试完成
     echo "$(date +"%Y-%m-%d %H:%M:%S") 开始等待所有测试完成"
@@ -243,7 +241,7 @@ consume_multi_topic_test() {
     echo "====================================================== [$request_uuid] $(date +"%Y-%m-%d %H:%M:%S")" >> $logfile
 
     duration=$((end_time - start_time))
-    echo "命令执行时间为: ${duration}ms"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
     tail -n 20 $logfile
 }
 
@@ -255,16 +253,16 @@ kill_all() {
     # 检查是否有匹配的进程
     if [ -n "$pids" ]; then
         # 终止匹配到的进程
-        echo "匹配到 $pid_count 个进程"
+        echo "$(date "+%Y-%m-%d %H:%M:%S") 匹配到 $pid_count 个进程"
         kill $pids
-        echo "已终止"
+        echo "$(date "+%Y-%m-%d %H:%M:%S") 已终止"
     else
-        echo "未匹配的进程"
+        echo "$(date "+%Y-%m-%d %H:%M:%S") 未匹配的进程"
     fi
 }
 
 if [[ $operation != "kill_all" && -z $kafka_bootstrap_servers ]]; then
-    echo "请提供 Kafka 集群信息"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 请提供 Kafka 集群信息"
     exit
 fi
 
@@ -286,5 +284,5 @@ elif [[ $operation == "consume_single_topic_test" ]]; then
 elif [[ $operation == "consume_multi_topic_test" ]]; then
     consume_multi_topic_test
 else
-    echo "请提供正确的参数"
+    echo "$(date "+%Y-%m-%d %H:%M:%S") 请提供正确的参数"
 fi
