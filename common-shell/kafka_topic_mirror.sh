@@ -96,6 +96,8 @@ backup_topic() {
 create_topic() {
     echo "创建 Kafka topic 数据开始..."
 
+    created_topic_count=0
+    created_partition_count=0
     # 读取备份文件内容
     while IFS= read -r line; do
         # 提取 topic 名称、分区和副本因子
@@ -107,13 +109,14 @@ create_topic() {
             replication_factor=${line#"ReplicationFactor: "}
 
             # 创建 topic
-            echo "$topic partition:[$partitions], replication_factor:[$replication_factor] 开始创建"
+            echo "$topic 开始创建, partition = $partitions, replication_factor = $replication_factor"
             echo "$kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --create --topic $topic --partitions $partitions --replication-factor $replication_factor"
-            echo "$topic 完成创建"
+            created_topic_count=$((created_topic_count + 1))
+            created_partition_count=$((created_partition_count + $partitions))
         fi
     done <$backup_file
 
-    echo "所有 Kafka topic 创建完成。"
+    echo "共创建 $created_topic_count 个 topic，共有 $created_partition_count 个 partition"
 }
 
 if [[ -z $kafka_bootstrap_servers ]]; then
