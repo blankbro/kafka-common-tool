@@ -134,3 +134,11 @@ source .env
 # 参考：https://stackoverflow.com/questions/1533811/how-can-i-format-bytes-a-cell-in-excel-as-kb-mb-gb-etc
 # =IF(A1>POWER(1024,4),TRUNC(A1/POWER(1024,4),2)&" TB", IF(A1>POWER(1024,3),TRUNC(A1/POWER(1024,3),2)&" GB", IF(A1>POWER(1024,2), ROUND(A1/POWER(1024,2),0)&" MB", ROUND(A1/1024,0)&" KB")))
 ```
+
+## 备份与恢复
+
+1. 备份
+
+```shell
+nohup ./kafka_topic_mirror.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --operation backup_topic > kafka_topic_mirror.log &
+```

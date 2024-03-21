@@ -48,3 +48,4 @@ build/
 kafka-docker/.env
 common-shell/.sasl.properties
 common-shell/.env
+common-shell/topic_backup.txt

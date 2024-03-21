@@ -99,11 +99,11 @@ partition_count() {
             blacklist_topic_count=$((blacklist_topic_count+1))
         else
             echo "$log_prefix 开始处理"
-            valid_topic_count=$((valid_topic_count + 1))
             # 获取当前 topic 的 partition 数量
             partition_count=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $4}')
             echo "$log_prefix 有 $partition_count 个 partition"
             partition_total_count=$((partition_total_count + partition_count))
+            valid_topic_count=$((valid_topic_count + 1))
         fi
         index=$((index + 1))
     done

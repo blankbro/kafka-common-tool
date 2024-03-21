@@ -2,7 +2,7 @@
 
 # 默认值
 kafka_bootstrap_servers=""
-backup_file=""
+backup_file="topic_backup.txt"
 create_input_file=""
 kafka_bin_dir="."
 operation=""
@@ -62,31 +62,38 @@ backup_topic() {
     echo "topic 总量: $topic_total_count"
 
     # 清空输出文件
-    echo "" >$backup_file
+    echo "" > $backup_file
 
     # 遍历每个 topic
     index=1
+    internal_topic_count=0
+    blacklist_topic_count=0
+    valid_topic_count=0
     for topic in $topics; do
-        echo "[$index/$topic_total_count] 开始处理 $topic"
+        log_prefix="[$index/$topic_total_count] $topic -"
         if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
-            echo "跳过 $topic"
-            index=$((index + 1))
-            continue
+            echo "$log_prefix kafka internal topic"
+            internal_topic_count=$((internal_topic_count+1))
         elif [[ $topic_grep != "" && $topic != *"$topic_grep"* ]]; then
-            echo "跳过不匹配的 Topic: $topic"
-            index=$((index + 1))
-            continue
+            echo "$log_prefix in blacklist"
+            blacklist_topic_count=$((blacklist_topic_count+1))
+        else
+            echo "$log_prefix 开始处理"
+            # 将数据写入输出文件
+            # echo $kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $1,$2}{print $3,$4} {print $5,$6}'
+            $kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $1,$2}{print $3,$4} {print $5,$6}' >> $backup_file
+
+            # 空行隔开
+            echo "" >> $backup_file
+            valid_topic_count=$((valid_topic_count + 1))
         fi
-
-        # 将数据写入输出文件
-        # echo $kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $1,$2}{print $3,$4} {print $5,$6}'
-        $kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $1,$2}{print $3,$4} {print $5,$6}' >>$backup_file
-
-        # 空行隔开
-        echo "" >>$backup_file
         index=$((index + 1))
     done
 
+    echo "topic_total_count: $topic_total_count"
+    echo "internal_topic_count: $internal_topic_count"
+    echo "blacklist_topic_count: $blacklist_topic_count"
+    echo "valid_topic_count: $valid_topic_count"
     echo "备份 Kafka topic 数据完成，并已写入文件: $backup_file"
 }
 
@@ -106,13 +113,13 @@ create_topic() {
             replication_factor=${line#"ReplicationFactor: "}
 
             # 创建 topic
-            echo "$topic parition:[$partitions], replication_factor:[$replication_factor] 开始创建"
-            # $kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --create --topic $topic --partitions $partitions --replication-factor $replication_factor
+            echo "$topic partition:[$partitions], replication_factor:[$replication_factor] 开始创建"
+            echo "$kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --create --topic $topic --partitions $partitions --replication-factor $replication_factor"
             echo "$topic 完成创建"
         fi
     done <$create_input_file
 
-    echo "创建 Kafka topic 数据完成。"
+    echo "所有 Kafka topic 创建完成。"
 }
 
 if [[ -z $kafka_bootstrap_servers ]]; then
