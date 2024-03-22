@@ -3,6 +3,7 @@
 kafka_bootstrap_servers=""
 kafka_bin_dir=""
 operation=""
+mock=1
 command_config=""
 
 while [[ $# -gt 0 ]]; do
@@ -22,6 +23,11 @@ while [[ $# -gt 0 ]]; do
         ;;
     --operation)
         operation="$2"
+        shift
+        shift
+        ;;
+    --mock)
+        mock="$2"
         shift
         shift
         ;;
@@ -54,8 +60,11 @@ delete_biz_topics() {
             skipped_topic_list="$skipped_topic_list \n\t$topic"
             skipped_topic_count=$((skipped_topic_count + 1))
         else
-            echo "$log_prefix 开始删除"
-            $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
+            echo "$log_prefix 准备删除"
+            if [[ $mock ]]; then
+                echo "$kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config"
+                $kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config
+            fi
             deleted_topic_count=$((deleted_topic_count + 1))
         fi
         index=$((index + 1))
@@ -85,9 +94,11 @@ delete_mm2_topics() {
     for topic in $topics; do
         log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
         if [[ $topic =~ .*.checkpoints.internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ mm2-.*.internal ]]; then
-            echo "$log_prefix 开始删除mm2 topic"
-            # echo "$kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config"
-            # $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
+            echo "$log_prefix 准备删除"
+            if [[ $mock ]]; then
+                echo "$kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config"
+                $kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config
+            fi
             deleted_topic_count=$((deleted_topic_count + 1))
         else
             skipped_topic_list="$skipped_topic_list \n\t$topic"
