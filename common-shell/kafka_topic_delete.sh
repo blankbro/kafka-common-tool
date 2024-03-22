@@ -86,7 +86,7 @@ delete_mm2_topics() {
             # $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
             deleted_topic_count=$((deleted_topic_count + 1))
         else
-            skipped_topic_list="$skipped_topic_list \n$topic"
+            skipped_topic_list="$skipped_topic_list \n\t$topic"
             skipped_topic_count=$((skipped_topic_count + 1))
         fi
         index=$((index + 1))
@@ -94,9 +94,9 @@ delete_mm2_topics() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
-    echo "skipped_topic_count: $skipped_topic_count"
     echo -e "skipped_topic_list: $skipped_topic_list"
     echo "topic_total_count: $topic_total_count"
+    echo "skipped_topic_count: $skipped_topic_count"
     echo "deleted_topic_count: $deleted_topic_count"
     echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
