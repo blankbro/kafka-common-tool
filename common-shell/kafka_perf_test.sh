@@ -135,7 +135,6 @@ delete_all_topics() {
 
     index=1
     for topic in $topics; do
-        echo "$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] 开始处理 $topic"
         if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
             echo "$(date "+%Y-%m-%d %H:%M:%S") 跳过 $topic"
         else
