@@ -59,8 +59,8 @@ topic_count() {
         index=$((index + 1))
     done
 
-    echo "internal_topic_list: $internal_topic_list"
-    echo "biz_topic_list: $biz_topic_list"
+    echo -e "internal_topic_list: $internal_topic_list"
+    echo -e "biz_topic_list: $biz_topic_list"
     echo "topic_total_count: $topic_total_count"
     echo "internal_topic_count: $internal_topic_count"
     echo "biz_topic_count: $biz_topic_count"
