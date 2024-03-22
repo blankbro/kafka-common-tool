@@ -36,7 +36,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-delete_all_topics() {
+# 删除业务 topic，排除内部 topic
+delete_biz_topics() {
     start_time=$(date +%s%3N)
 
     topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers $command_config --list)
@@ -46,10 +47,11 @@ delete_all_topics() {
     index=1
     skipped_topic_count=0
     deleted_topic_count=0
+    skipped_topic_list=""
     for topic in $topics; do
         log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
         if [[ $topic =~ .*[-.]internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
-            echo "$log_prefix 跳过内部topic"
+            skipped_topic_list="$skipped_topic_list \n\t$topic"
             skipped_topic_count=$((skipped_topic_count + 1))
         else
             echo "$log_prefix 开始删除"
@@ -61,12 +63,14 @@ delete_all_topics() {
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
+    echo -e "skipped_topic_list: $skipped_topic_list"
     echo "topic_total_count: $topic_total_count"
     echo "skipped_topic_count: $skipped_topic_count"
     echo "deleted_topic_count: $deleted_topic_count"
     echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
 
+# 删除 mm2 相关的 topic
 delete_mm2_topics() {
     start_time=$(date +%s%3N)
 
@@ -107,8 +111,8 @@ if [[ -z $kafka_bootstrap_servers ]]; then
 fi
 
 # 根据参数执行对应功能
-if [[ $operation == "delete_all_topics" ]]; then
-    delete_all_topics
+if [[ $operation == "delete_biz_topics" ]]; then
+    delete_biz_topics
 elif [[ $operation == "delete_mm2_topics" ]]; then
     delete_mm2_topics
 else
