@@ -86,10 +86,9 @@ delete_mm2_topics() {
             # $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
             deleted_topic_count=$((deleted_topic_count + 1))
         else
-            skipped_topic_list="$skipped_topic_list, $topic"
+            skipped_topic_list="$skipped_topic_list \n$topic"
             skipped_topic_count=$((skipped_topic_count + 1))
         fi
-        echo ""
         index=$((index + 1))
     done
 
