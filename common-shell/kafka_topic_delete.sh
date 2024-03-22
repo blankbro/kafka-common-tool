@@ -77,7 +77,7 @@ delete_mm2_topics() {
     index=1
     for topic in $topics; do
         log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
-        if [[ $topic =~ .*.checkpoints.internal || $topic == "heartbeats" || $topic =~ mm2-.*.internal ]]; then
+        if [[ $topic =~ .*.checkpoints.internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ mm2-.*.internal ]]; then
             echo "$log_prefix 开始删除mm2 topic"
             echo "$kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config"
             # $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
