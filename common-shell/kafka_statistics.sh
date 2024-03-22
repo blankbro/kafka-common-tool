@@ -4,7 +4,6 @@
 kafka_bootstrap_servers=""
 kafka_bin_dir="."
 operation=""
-topic_blacklist=""
 
 # 解析命令行参数
 # $# 是一个特殊变量，表示命令行参数的数量。-gt 是一个比较运算符，表示大于。
@@ -29,11 +28,6 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
-    --topic_blacklist)
-        topic_blacklist="$2"
-        shift
-        shift
-        ;;
     *)
         shift
         ;;
@@ -49,28 +43,27 @@ topic_count() {
 
     # 遍历每个 topic
     index=1
+    internal_topic_list=""
     internal_topic_count=0
-    blacklist_topic_count=0
-    valid_topic_count=0
+    biz_topic_count=0
+    biz_topic_list=""
     for topic in $topics; do
         log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
         if [[ $topic =~ .*[-.]internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
-            echo "$log_prefix kafka internal topic"
+            internal_topic_list="$internal_topic_list \n\t$topic"
             internal_topic_count=$((internal_topic_count+1))
-        elif [[ $topic_blacklist != "" && $topic != *"$topic_blacklist"* ]]; then
-            echo "$log_prefix in blacklist"
-            blacklist_topic_count=$((blacklist_topic_count+1))
         else
-            echo "$log_prefix 开始处理"
-            valid_topic_count=$((valid_topic_count + 1))
+            biz_topic_list="$biz_topic_list \n\t$topic"
+            biz_topic_count=$((biz_topic_count + 1))
         fi
         index=$((index + 1))
     done
 
+    echo "internal_topic_list: $internal_topic_list"
+    echo "biz_topic_list: $biz_topic_list"
     echo "topic_total_count: $topic_total_count"
     echo "internal_topic_count: $internal_topic_count"
-    echo "blacklist_topic_count: $blacklist_topic_count"
-    echo "valid_topic_count: $valid_topic_count"
+    echo "biz_topic_count: $biz_topic_count"
 }
 
 partition_count() {
@@ -84,32 +77,27 @@ partition_count() {
     # 遍历每个 topic
     index=1
     internal_topic_count=0
-    blacklist_topic_count=0
-    valid_topic_count=0
+    biz_topic_count=0
     partition_total_count=0
     for topic in $topics; do
         log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
         if [[ $topic =~ .*[-.]internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
             echo "$log_prefix kafka internal topic"
             internal_topic_count=$((internal_topic_count+1))
-        elif [[ $topic_blacklist != "" && $topic != *"$topic_blacklist"* ]]; then
-            echo "$log_prefix in blacklist"
-            blacklist_topic_count=$((blacklist_topic_count+1))
         else
             echo "$log_prefix 开始处理"
             # 获取当前 topic 的 partition 数量
             partition_count=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --describe --topic $topic | grep "PartitionCount" | awk '{print $4}')
             echo "$log_prefix 有 $partition_count 个 partition"
             partition_total_count=$((partition_total_count + partition_count))
-            valid_topic_count=$((valid_topic_count + 1))
+            biz_topic_count=$((biz_topic_count + 1))
         fi
         index=$((index + 1))
     done
 
     echo "topic_total_count: $topic_total_count"
     echo "internal_topic_count: $internal_topic_count"
-    echo "blacklist_topic_count: $blacklist_topic_count"
-    echo "valid_topic_count: $valid_topic_count"
+    echo "biz_topic_count: $biz_topic_count"
     echo "partition_total_count: $partition_total_count"
 }
 
