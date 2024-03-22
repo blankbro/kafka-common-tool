@@ -25,7 +25,8 @@ B->A.enabled = false
 # 要复制的主题的正则表达式，例如“topic1, topic2, topic3”。 还支持逗号分隔列表。
 topics = .*
 # 要从复制中排除的主题，例如：“..internal, ..replica, __consumer_offsets”或类似形式
-topics.blacklist = .*[\-\.]internal, .*\.replica, __consumer_offsets, exclude_.*
+# topics.blacklist 已弃用，新版本是 topics.exclude
+topics.exclude = .*[\-\.]internal, .*\.replica, __consumer_offsets, exclude_.*
 # 连接器应定期检查是否有新的topic
 refresh.topics.enabled = true
 # 检查源群集是否有新topic的频率
