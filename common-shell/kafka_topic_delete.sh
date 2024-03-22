@@ -75,20 +75,28 @@ delete_mm2_topics() {
     echo "$(date "+%Y-%m-%d %H:%M:%S") topic 总量: $topic_total_count"
 
     index=1
+    skipped_topic_count=0
+    deleted_topic_count=0
     for topic in $topics; do
         log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
         if [[ $topic =~ .*.checkpoints.internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ mm2-.*.internal ]]; then
             echo "$log_prefix 开始删除mm2 topic"
-            echo "$kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config"
+            # echo "$kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config"
             # $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
+            deleted_topic_count=$((deleted_topic_count + 1))
         else
             echo "$log_prefix 跳过其它 topic"
+            skipped_topic_count=$((skipped_topic_count + 1))
         fi
+        echo ""
         index=$((index + 1))
     done
 
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
+    echo "topic_total_count: $topic_total_count"
+    echo "skipped_topic_count: $skipped_topic_count"
+    echo "deleted_topic_count: $deleted_topic_count"
     echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
 

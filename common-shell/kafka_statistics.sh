@@ -52,7 +52,6 @@ topic_count() {
     internal_topic_count=0
     blacklist_topic_count=0
     valid_topic_count=0
-    partition_total_count=0
     for topic in $topics; do
         log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
         if [[ $topic =~ .*[-.]internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
@@ -72,7 +71,6 @@ topic_count() {
     echo "internal_topic_count: $internal_topic_count"
     echo "blacklist_topic_count: $blacklist_topic_count"
     echo "valid_topic_count: $valid_topic_count"
-    echo "partition_total_count: $partition_total_count"
 }
 
 partition_count() {
