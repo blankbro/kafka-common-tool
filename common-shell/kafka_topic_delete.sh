@@ -3,7 +3,7 @@
 kafka_bootstrap_servers=""
 kafka_bin_dir=""
 operation=""
-mock=1
+real_delete=1
 command_config=""
 
 while [[ $# -gt 0 ]]; do
@@ -26,8 +26,8 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
-    --mock)
-        mock="$2"
+    --real-delete)
+        real_delete="$2"
         shift
         shift
         ;;
@@ -61,7 +61,7 @@ delete_biz_topics() {
             skipped_topic_count=$((skipped_topic_count + 1))
         else
             echo "$log_prefix 准备删除"
-            if [[ $mock ]]; then
+            if [[ $real_delete ]]; then
                 echo "$kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config"
                 $kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config
             fi
@@ -95,7 +95,7 @@ delete_mm2_topics() {
         log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
         if [[ $topic =~ .*.checkpoints.internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ mm2-.*.internal ]]; then
             echo "$log_prefix 准备删除"
-            if [[ $mock ]]; then
+            if [[ $real_delete ]]; then
                 echo "$kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config"
                 $kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config
             fi
