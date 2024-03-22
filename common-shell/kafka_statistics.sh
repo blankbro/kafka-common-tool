@@ -55,7 +55,8 @@ topic_count() {
     partition_total_count=0
     for topic in $topics; do
         log_prefix="[$index/$topic_total_count] $topic -"
-        if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
+#        if [[ $topic == "__consumer_offsets" || $topic == "ATLAS_ENTITIES" || $topic == "__amazon_msk_canary" ]]; then
+        if [[ $topic =~ .*[-.]internal || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
             echo "$log_prefix kafka internal topic"
             internal_topic_count=$((internal_topic_count+1))
         elif [[ $topic_blacklist != "" && $topic != *"$topic_blacklist"* ]]; then
