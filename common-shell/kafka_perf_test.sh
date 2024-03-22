@@ -135,7 +135,7 @@ delete_all_topics() {
 
     index=1
     for topic in $topics; do
-        if [[ $topic =~ .*[-.]internal || $topic =~ .*.heartbeats || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
+        if [[ $topic =~ .*[-.]internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
             echo "$(date "+%Y-%m-%d %H:%M:%S") 跳过 $topic"
         else
             echo "$(date "+%Y-%m-%d %H:%M:%S") 开始删除 $topic"
