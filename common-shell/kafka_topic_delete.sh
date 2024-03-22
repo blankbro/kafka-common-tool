@@ -95,7 +95,7 @@ delete_mm2_topics() {
     end_time=$(date +%s%3N)
     duration=$((end_time - start_time))
     echo "skipped_topic_count: $skipped_topic_count"
-    echo "skipped_topic_list: $skipped_topic_list"
+    echo -e "skipped_topic_list: $skipped_topic_list"
     echo "topic_total_count: $topic_total_count"
     echo "deleted_topic_count: $deleted_topic_count"
     echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
