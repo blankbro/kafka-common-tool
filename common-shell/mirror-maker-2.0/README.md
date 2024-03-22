@@ -23,11 +23,8 @@ topic="A.exclude_testA"
 cp mm2.properties.template mm2.properties
 vim mm2.properties
 
-# 设置好环境变量
-source .env
-
 # 启动
-mm2.sh start
+mm2.sh --kafka-bin-dir /Users/lizexin/application/kafka/kafka_2.13-3.0.0/bin --mm2-properties mm2.properties --operation start
 ```
 
 **Topic 相关操作**

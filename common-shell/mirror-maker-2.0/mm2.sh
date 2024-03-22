@@ -2,6 +2,38 @@
 
 # 提前设置好 kafka_bin_dir 环境变量
 
+kafka_bin_dir="."
+mm2_properties=""
+operation=""
+
+# 解析命令行参数
+# $# 是一个特殊变量，表示命令行参数的数量。-gt 是一个比较运算符，表示大于。
+while [[ $# -gt 0 ]]; do
+    # 将当前处理的命令行参数赋值给变量 key
+    key="$1"
+
+    case $key in
+    --kafka-bin-dir)
+        kafka_bin_dir="$2"
+        shift
+        shift
+        ;;
+    --mm2-properties)
+        mm2_properties="$2"
+        shift
+        shift
+        ;;
+    --operation)
+        operation="$2"
+        shift
+        shift
+        ;;
+    *)
+        shift
+        ;;
+    esac
+done
+
 Stop(){
     pid=$(ps -ef | grep "connect-mirror-maker" | grep -v grep | grep -v kill | awk '{print $2}')
     if [ -n "${pid}" ]; then
@@ -39,8 +71,8 @@ Start(){
 
     # 不再控制台打印任何日志: &>/dev/null 相当于 >/dev/null 2>&1
     # 后台启动: &
-    echo "sh ${kafka_bin_dir}/connect-mirror-maker.sh mm2.properties &>/dev/null &"
-    sh ${kafka_bin_dir}/connect-mirror-maker.sh mm2.properties &>/dev/null &
+    echo "sh ${kafka_bin_dir}/connect-mirror-maker.sh ${mm2_properties} &>/dev/null &"
+    sh ${kafka_bin_dir}/connect-mirror-maker.sh ${mm2_properties} &>/dev/null &
 
     for ((i=0; i<10; ++i)) do
         sleep 1
@@ -63,7 +95,7 @@ Ps(){
     ps -ef | grep "connect-mirror-maker" | grep -v grep | grep -v kill
 }
 
-case $1 in
+case $operation in
     "ps" )
         Ps
     ;;
