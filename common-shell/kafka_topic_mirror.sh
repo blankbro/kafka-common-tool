@@ -64,7 +64,7 @@ backup_topic() {
     blacklist_topic_count=0
     valid_topic_count=0
     for topic in $topics; do
-        log_prefix="[$index/$topic_total_count] $topic -"
+        log_prefix="$(date "+%Y-%m-%d %H:%M:%S") [$index/$topic_total_count] $topic -"
         if [[ $topic =~ .*[-.]internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
             echo "$log_prefix kafka internal topic"
             internal_topic_count=$((internal_topic_count+1))

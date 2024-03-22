@@ -96,7 +96,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-create_topics() {
+create_test_topic() {
     start_time=$(date +%s%3N)
 
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
@@ -111,7 +111,7 @@ create_topics() {
     echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
 }
 
-delete_topics() {
+delete_test_topic() {
     start_time=$(date +%s%3N)
 
     for ((i = $multi_topic_start; i <= $multi_topic_end; i++)); do
@@ -119,29 +119,6 @@ delete_topics() {
         topic_name="topic_$formatted_number"
         echo "$(date "+%Y-%m-%d %H:%M:%S") 开始删除 $topic_name"
         $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic_name" --bootstrap-server $kafka_bootstrap_servers $command_config
-    done
-
-    end_time=$(date +%s%3N)
-    duration=$((end_time - start_time))
-    echo "$(date "+%Y-%m-%d %H:%M:%S") 命令执行时间为: ${duration}ms"
-}
-
-delete_all_topics() {
-    start_time=$(date +%s%3N)
-
-    topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers $command_config --list)
-    topic_total_count=$(echo $topics | wc -w)
-    echo "$(date "+%Y-%m-%d %H:%M:%S") topic 总量: $topic_total_count"
-
-    index=1
-    for topic in $topics; do
-        if [[ $topic =~ .*[-.]internal || $topic == "heartbeats" || $topic =~ .*.heartbeats || $topic =~ .*.replica || $topic =~ __.* || $topic == "ATLAS_ENTITIES" ]]; then
-            echo "$(date "+%Y-%m-%d %H:%M:%S") 跳过 $topic"
-        else
-            echo "$(date "+%Y-%m-%d %H:%M:%S") 开始删除 $topic"
-            $kafka_bin_dir/kafka-topics.sh --delete --topic "$topic" --bootstrap-server $kafka_bootstrap_servers $command_config
-        fi
-        index=$((index + 1))
     done
 
     end_time=$(date +%s%3N)
@@ -266,12 +243,10 @@ if [[ $operation != "kill_all" && -z $kafka_bootstrap_servers ]]; then
 fi
 
 # 根据参数执行对应功能
-if [[ $operation == "create_topics" ]]; then
-    create_topics
-elif [[ $operation == "delete_topics" ]]; then
-    delete_topics
-elif [[ $operation == "delete_all_topics" ]]; then
-    delete_all_topics
+if [[ $operation == "create_test_topic" ]]; then
+    create_test_topic
+elif [[ $operation == "delete_test_topic" ]]; then
+    delete_test_topic
 elif [[ $operation == "produce_single_topic_test" ]]; then
     produce_single_topic_test
 elif [[ $operation == "produce_multi_topic_test" ]]; then
