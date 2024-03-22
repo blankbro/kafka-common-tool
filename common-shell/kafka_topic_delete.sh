@@ -64,6 +64,7 @@ delete_biz_topics() {
             if [[ $real_delete == "true" ]]; then
                 echo "$kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config"
                 $kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config
+                echo ""
             fi
             deleted_topic_count=$((deleted_topic_count + 1))
         fi
@@ -98,6 +99,7 @@ delete_mm2_topics() {
             if [[ $real_delete == "true" ]]; then
                 echo "$kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config"
                 $kafka_bin_dir/kafka-topics.sh --delete --topic $topic --bootstrap-server $kafka_bootstrap_servers $command_config
+                echo ""
             fi
             deleted_topic_count=$((deleted_topic_count + 1))
         else
