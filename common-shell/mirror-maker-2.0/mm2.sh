@@ -39,7 +39,7 @@ Stop(){
     if [ -n "${pid}" ]; then
         echo "kill ${pid}"
         kill ${pid}
-        for ((i=0; i<10; ++i)) do
+        for ((i=0; i<30; ++i)) do
             sleep 1
             pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh' | awk '{print $2}')
             if [ -n "${pid}" ]; then
