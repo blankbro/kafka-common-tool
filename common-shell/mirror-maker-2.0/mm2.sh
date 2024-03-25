@@ -94,7 +94,7 @@ Start(){
 }
 
 Ps(){
-    ps -ef | grep "${mm2_properties}" | grep -v grep | grep -v ps | grep -v kill
+    ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh'
 }
 
 case $operation in
