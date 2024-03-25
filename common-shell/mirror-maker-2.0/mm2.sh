@@ -35,13 +35,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 Stop(){
-    pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill' | awk '{print $2}')
+    pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh' | awk '{print $2}')
     if [ -n "${pid}" ]; then
         echo "kill ${pid}"
         kill ${pid}
         for ((i=0; i<10; ++i)) do
             sleep 1
-            pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill' | awk '{print $2}')
+            pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh' | awk '{print $2}')
             if [ -n "${pid}" ]; then
                 echo -e ".\c"
             else
@@ -50,7 +50,7 @@ Stop(){
             fi
         done
 
-        pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill' | awk '{print $2}')
+        pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh' | awk '{print $2}')
         if [ -n "${pid}" ]; then
           echo "kill -9 ${pid}"
           kill -9 ${pid}
@@ -61,7 +61,7 @@ Stop(){
 }
 
 Start(){
-    pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill' | awk '{print $2}')
+    pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh' | awk '{print $2}')
     # -n: string is not empty
     # -z: string is empty
     if [ -n "${pid}" ]; then
@@ -78,7 +78,7 @@ Start(){
 
     for ((i=0; i<10; ++i)) do
         sleep 1
-        pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill' | awk '{print $2}')
+        pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh' | awk '{print $2}')
         if [ -z "${pid}" ]; then
             echo -e ".\c"
         else
@@ -87,7 +87,7 @@ Start(){
         fi
     done
 
-    pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill' | awk '{print $2}')
+    pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh' | awk '{print $2}')
     if [ -z "${pid}" ]; then
       echo '启动失败'
     fi
