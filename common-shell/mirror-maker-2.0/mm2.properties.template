@@ -1,6 +1,9 @@
 # Sample MirrorMaker 2.0 top-level configuration file
 # Run with ./bin/connect-mirror-maker.sh mm2.properties
 
+# name of the connector, e.g. "us-west->us-east"
+name = A->B
+
 ############################# Cluster Settings  #############################
 
 # specify any number of cluster aliases
