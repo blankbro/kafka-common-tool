@@ -94,7 +94,15 @@ Start(){
 }
 
 Ps(){
-    ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh'
+    ps_result=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|kill|mm2\.sh')
+    # -n: string is not empty
+    # -z: string is empty
+    if [ -z "${ps_result}" ]; then
+        echo "进程已关闭"
+        exit 0
+    fi
+
+    echo ${ps_result}
 }
 
 case $operation in
