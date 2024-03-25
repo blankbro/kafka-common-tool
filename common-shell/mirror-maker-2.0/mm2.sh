@@ -62,6 +62,8 @@ Stop(){
 
 Start(){
     pid=$(ps -ef | grep "${mm2_properties}" | grep -Ev 'grep|ps|kill' | awk '{print $2}')
+    # -n: string is not empty
+    # -z: string is empty
     if [ -n "${pid}" ]; then
         echo "进程已启动"
         exit 0
