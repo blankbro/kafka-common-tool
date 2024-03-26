@@ -30,12 +30,12 @@ while [[ $# -gt 0 ]]; do
         shift
         shift
         ;;
-    --backup_file)
+    --backup-file)
         backup_file="$2"
         shift
         shift
         ;;
-    --topic_blacklist)
+    --topic-blacklist)
         topic_blacklist="$2"
         shift
         shift

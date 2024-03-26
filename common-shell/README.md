@@ -140,7 +140,7 @@ source .env
 1. 备份 topic
 
 ```shell
-nohup ./kafka_topic_mirror.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --operation backup_topic > kafka_topic_mirror.log &
+nohup ./kafka_topic_mirror.sh --kafka-bin-dir $kafka_bin_dir --bootstrap-server $bootstrap_server --operation backup_topic > kafka_topic_mirror.log 2>&1 &
 ```
 
 2. 创建 topic
