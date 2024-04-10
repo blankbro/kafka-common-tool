@@ -24,7 +24,14 @@ cp mm2.properties.template mm2.properties
 vim mm2.properties
 
 # 启动
-mm2.sh --kafka-bin-dir /Users/lizexin/application/kafka/kafka_2.13-3.0.0/bin --mm2-properties mm2.properties --operation start
+./mm2.sh --kafka-bin-dir /Users/lizexin/application/kafka/kafka_2.13-3.0.0/bin --mm2-properties mm2.properties --operation restart
+
+# 看log
+tail -f /Users/lizexin/application/kafka/kafka_2.13-3.0.0/logs/connect.log
+
+# 设置监控
+https://github.com/erviveksoni/aws_msk_mm2/blob/main/docs/3_Setting_Up_Prometheus.md
+
 ```
 
 **Topic 相关操作**
@@ -62,7 +69,7 @@ kafka-topics.sh --bootstrap-server $kafka_server --alter --partitions 11 --topic
 kafka-topics.sh --bootstrap-server $kafka_server --list
 
 # 获取topic消息量
-kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list $kafka_server --topic $topic --time -1
+kafka-run-class.sh kafka.tools.GetOffsetShell --broker-list $kafka_server --time -1 --topic $topic
 ```
 
 **Producer 相关**
