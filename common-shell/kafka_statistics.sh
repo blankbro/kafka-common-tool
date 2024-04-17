@@ -143,6 +143,7 @@ topic_bytes() {
         topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
         topic_total_count=$(echo $topics | wc -w)
         echo "topic 总量: $topic_total_count"
+        echo "" > topic_dir_bytes.log
 
         # 遍历每个 topic
         index=1
