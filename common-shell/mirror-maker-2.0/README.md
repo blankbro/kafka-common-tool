@@ -24,7 +24,7 @@ cp mm2.properties.template mm2.properties
 vim mm2.properties
 
 # 启动
-./mm2.sh --kafka-bin-dir /Users/lizexin/application/kafka/kafka_2.13-3.0.0/bin --mm2-properties mm2.properties --operation restart
+./control.sh --kafka-bin-dir /Users/lizexin/application/kafka/kafka_2.13-3.0.0/bin --mm2-properties mm2.properties --operation restart
 
 # 看log
 tail -f /Users/lizexin/application/kafka/kafka_2.13-3.0.0/logs/connect.log

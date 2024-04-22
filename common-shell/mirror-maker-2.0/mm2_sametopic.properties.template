@@ -1,0 +1,30 @@
+name = A_B_sametopic_mm2
+############################# Cluster Settings  #############################
+clusters = A, B
+A.bootstrap.servers = xx
+B.bootstrap.servers = xx
+
+A->B.enabled = true
+B->A.enabled = false
+
+# 启动同步的Task数量(设置成 MM2 所在服务器 CPU 的2倍)
+tasks.max = 16
+
+############################# Topic Sync Settings  #############################
+# 复制指定topic
+topics = xxx, xxx
+
+# 连接器应定期检查是否有新的topic
+refresh.topics.enabled = false
+refresh.groups.enabled = false
+emit.checkpoints.enables = false
+emit.heartbeats.enabled = false
+sync.topic.configs.enabled = false
+sync.topic.acls.enabled = false
+offset-syncs.topic.location = target
+
+# 复制到 azure 都是 3 副本的
+replication.factor = 3
+
+# 设置同步的topic Name命名规则；3.0版本提供了两种topic同步命名规则，默认会带上前缀,也可以手动不带前缀的----此时不能做双向同步
+replication.policy.class = org.apache.kafka.connect.mirror.IdentityReplicationPolicy
