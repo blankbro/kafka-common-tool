@@ -126,6 +126,15 @@ create_topic() {
     echo "created_partition_count: $created_partition_count"
 }
 
+# 获取
+# ./kafka-topics.sh --bootstrap-server <host:port> --list
+# 获取 topic 配置
+# ./kafka-configs.sh --bootstrap-server <host:port> --describe --entity-type topics --entity-name <topic_name>
+# Dynamic configs for topic xxxx are:
+#  retention.ms=21600000 sensitive=false synonyms={DYNAMIC_TOPIC_CONFIG:retention.ms=21600000}
+# 调整 topic 过期时间
+# kafka-configs.sh --bootstrap-server ip:端口 --alter --entity-name topic名称 --entity-type topics --add-config retention.ms=86400000
+
 if [[ -z $kafka_bootstrap_servers ]]; then
     echo "请提供 Kafka 集群信息"
     exit
