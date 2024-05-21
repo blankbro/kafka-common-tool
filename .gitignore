@@ -50,5 +50,6 @@ common-shell/.sasl.properties
 common-shell/.env
 common-shell/topic_backup.txt
 common-shell/backup_*.txt
+common-shell/*.txt
 common-shell/mirror-maker-2.0/mm2.properties
 common-shell/mirror-maker-2.0/*.properties
