@@ -1,14 +1,16 @@
 package io.github.blankbro.springbootkafka.kafka;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 @Slf4j
+@ConditionalOnExpression("'${TestKafkaListener}' == 'true'")
 @Component
-public class CustomKafkaConsumer {
+public class TestKafkaListener {
 
     @KafkaListener(
             topics = "topic_test_bytes",
@@ -34,4 +36,5 @@ public class CustomKafkaConsumer {
             log.info("string message: {}", message);
         }
     }
+
 }

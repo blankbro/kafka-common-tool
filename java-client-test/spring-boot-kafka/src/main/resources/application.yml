@@ -42,3 +42,6 @@ kafka-consumer:
   concurrency:
     topic_test_string: 16
     topic_test_bytes: 16
+
+TestKafkaListener: false
+FindDataKafkaListener: false

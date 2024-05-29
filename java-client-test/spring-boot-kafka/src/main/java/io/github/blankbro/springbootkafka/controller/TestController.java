@@ -1,6 +1,6 @@
 package io.github.blankbro.springbootkafka.controller;
 
-import io.github.blankbro.springbootkafka.kafka.CustomKafkaProducer;
+import io.github.blankbro.springbootkafka.kafka.KafkaProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +14,7 @@ import java.util.Date;
 public class TestController {
 
     @Autowired
-    private CustomKafkaProducer customKafkaProducer;
+    private KafkaProducer kafkaProducer;
 
     /**
      * 从容器中创建 topic
@@ -31,7 +31,7 @@ public class TestController {
     @GetMapping("/send")
     public Object send(String topic, String data) {
         log.info("topic = {}, data = {}", topic, data);
-        customKafkaProducer.send(topic, data);
+        kafkaProducer.send(topic, data);
         return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date()) + " ok";
     }
 
