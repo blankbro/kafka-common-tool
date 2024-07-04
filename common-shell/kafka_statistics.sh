@@ -71,6 +71,9 @@ partition_count() {
 
     # 获取 Kafka topic 列表
     topics=$($kafka_bin_dir/kafka-topics.sh --bootstrap-server $kafka_bootstrap_servers --list)
+#    custom_topics=("aa" "bb")
+#    topics=${custom_topics[@]}
+
     topic_total_count=$(echo $topics | wc -w)
     echo "topic 总量: $topic_total_count"
 
